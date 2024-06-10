@@ -16,3 +16,8 @@
   background-color: #f4f4f4;
   padding: 20px;
 }
+
+/* might necessary for react-leaflet-draw */
+.sr-only {
+  display: none;
+}

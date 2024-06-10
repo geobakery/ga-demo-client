@@ -1,6 +1,8 @@
 import React from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { LatLngExpression } from 'leaflet';
+import { FeatureGroup } from 'react-leaflet';
+import { EditControl } from 'react-leaflet-draw';
 import './App.css';
 
 const App: React.FC = () => {
@@ -19,6 +21,22 @@ const App: React.FC = () => {
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          <FeatureGroup>
+            <EditControl
+              position="topright"
+              draw={{
+                rectangle: false,
+                polyline: true,
+                circle: false,
+                circlemarker: false,
+                marker: true,
+                polygon: true,
+              }}
+              edit={{
+                remove: true,
+              }}
+            />
+          </FeatureGroup>
         </MapContainer>
       </div>
       <div className="sidebar">
