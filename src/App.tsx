@@ -1,50 +1,28 @@
 import React from 'react';
-import { MapContainer, TileLayer } from 'react-leaflet';
 import { LatLngExpression } from 'leaflet';
-import { FeatureGroup } from 'react-leaflet';
-import { EditControl } from 'react-leaflet-draw';
+import Map from './components/Map.tsx';
+import Sidebar from './components/Sidebar.tsx';
 import './App.css';
 
-const App: React.FC = () => {
-  const position: LatLngExpression = [51.05089, 13.73832];
+interface AppProps {
+  // Define any props here, if necessary
+}
 
-  return (
-    <div className="app-container">
-      <div className="map-container">
-        <MapContainer
-          center={position}
-          zoom={13}
-          scrollWheelZoom={true}
-          style={{ height: '100%', width: '100%' }}
-        >
-          <TileLayer
-            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          <FeatureGroup>
-            <EditControl
-              position="topright"
-              draw={{
-                rectangle: false,
-                polyline: true,
-                circle: false,
-                circlemarker: false,
-                marker: true,
-                polygon: true,
-              }}
-              edit={{
-                remove: true,
-              }}
-            />
-          </FeatureGroup>
-        </MapContainer>
-      </div>
-      <div className="sidebar">
-        <h2>Sidebar</h2>
-        <p></p>
-      </div>
-    </div>
-  );
-};
+interface AppState {
+  // Define any state here, if necessary
+}
 
+class App extends React.Component<AppProps, AppState> {
+  render() {
+    const initialPosition: LatLngExpression = [51.05089, 13.73832];
+    const initialZoom: number = 13;
+
+    return (
+      <div className="app-container">
+        <Map initialPosition={initialPosition} initialZoom={initialZoom} />
+        <Sidebar />
+      </div>
+    );
+  }
+}
 export default App;

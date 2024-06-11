@@ -7,14 +7,17 @@
 .map-container {
   flex: 1;
   padding: 20px;
-  background-color: #f4f4f4;
 }
 
 .sidebar {
   flex: 0 0 300px;
-  color: gray;
-  background-color: #f4f4f4;
   padding: 20px;
+}
+
+@media (prefers-color-scheme: light) {
+  .sidebar {
+    color: gray;
+  }
 }
 
 /* might necessary for react-leaflet-draw */
