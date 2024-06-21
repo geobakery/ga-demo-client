@@ -1,13 +1,12 @@
 import React, { useRef } from 'react';
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
-import L, { LatLngExpression } from 'leaflet';
+import L, { DrawEvents, LatLngExpression } from 'leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import { Feature, Geometry } from 'geojson';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
-interface LeafletEvent {
-  layers: L.LayerGroup<L.Layer>;
+interface CreatedEvent {
   layer: L.Layer;
 }
 
@@ -24,7 +23,7 @@ const Map: React.FC<MapProps> = ({
 }) => {
   const featureGroupRef = useRef<L.FeatureGroup>(null);
 
-  const onEdited = (e: LeafletEvent) => {
+  const onEdited = (e: DrawEvents.Edited) => {
     const layers = e.layers;
     const geometries: Feature<Geometry>[] = [];
 
@@ -37,15 +36,17 @@ const Map: React.FC<MapProps> = ({
       }
     });
 
+    console.log('Edited geometries:', geometries);
     setGeometries(geometries);
   };
 
-  const onCreated = (e: LeafletEvent) => {
+  const onCreated = (e: CreatedEvent) => {
     const { layer } = e;
 
-    // Überprüfen, ob der Layer ein FeatureLayer ist, der die toGeoJSON-Methode hat
+    // Check that the layer is a FeatureLayer that has the toGeoJSON method
     if ('toGeoJSON' in layer && typeof layer.toGeoJSON === 'function') {
       const geoJson = (layer as L.FeatureGroup).toGeoJSON();
+      console.log('Created geometry:', geoJson);
       setGeometries([geoJson as Feature<Geometry>]);
     } else {
       console.error('Layer does not support toGeoJSON method');
