@@ -1,28 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { LatLngExpression } from 'leaflet';
-import Map from './components/Map.tsx';
-import Sidebar from './components/Sidebar.tsx';
+import Map from './components/Map';
+import APICall from './components/APICall';
+import { Feature, Geometry } from 'geojson';
 import './App.css';
 
-interface AppProps {
-  // Define any props here, if necessary
-}
+const App: React.FC = () => {
+  const [geometries, setGeometries] = useState<Feature<Geometry>[]>([]);
+  const initialPosition: LatLngExpression = [51.05089, 13.73832];
+  const initialZoom: number = 13;
 
-interface AppState {
-  // Define any state here, if necessary
-}
+  return (
+    <div className="app-container">
+      <Map
+        initialPosition={initialPosition}
+        initialZoom={initialZoom}
+        setGeometries={setGeometries}
+      />
+      <APICall geometries={geometries} />
+    </div>
+  );
+};
 
-class App extends React.Component<AppProps, AppState> {
-  render() {
-    const initialPosition: LatLngExpression = [51.05089, 13.73832];
-    const initialZoom: number = 13;
-
-    return (
-      <div className="app-container">
-        <Map initialPosition={initialPosition} initialZoom={initialZoom} />
-        <Sidebar />
-      </div>
-    );
-  }
-}
 export default App;

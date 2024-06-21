@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@types/geojson':
+        specifier: ^7946.0.14
+        version: 7946.0.14
       '@types/leaflet-draw':
         specifier: ^1.0.11
         version: 1.0.11
