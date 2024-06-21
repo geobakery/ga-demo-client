@@ -9,6 +9,7 @@ const APICall: React.FC<APICallProps> = ({ geometries }) => {
   const [result, setResult] = useState('');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedInterface, setSelectedInterface] = useState<string>('within');
+  const [returnGeometryChecked, setChecked] = React.useState(false);
 
   const handleInterfaceChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
@@ -24,6 +25,10 @@ const APICall: React.FC<APICallProps> = ({ geometries }) => {
     setSelectedTopics(selectedOptions);
   };
 
+  const toggleGeometryCheckbox = () => {
+    setChecked(!returnGeometryChecked);
+  };
+
   const sendGeometryToAPI = () => {
     if (geometries.length === 0) {
       console.error('No geometries to send');
@@ -35,7 +40,7 @@ const APICall: React.FC<APICallProps> = ({ geometries }) => {
       topics: selectedTopics,
       inputGeometries: geometries,
       outputFormat: 'geojson',
-      returnGeometry: false,
+      returnGeometry: returnGeometryChecked,
       outSRS: 4326,
     };
 
@@ -66,9 +71,9 @@ const APICall: React.FC<APICallProps> = ({ geometries }) => {
     <div className="sidebar">
       <h2>API Call</h2>
       <div className="sidebar-content">
-        <label>
-          <p>Choose interface:</p>
-          <p>
+        <fieldset>
+          <legend>Choose Interface</legend>
+          <label>
             <select
               name="selectedInterface"
               multiple={false}
@@ -77,13 +82,13 @@ const APICall: React.FC<APICallProps> = ({ geometries }) => {
               <option value="within">Within</option>
               <option value="intersect">Intersect</option>
             </select>
-          </p>
-        </label>
+          </label>
+        </fieldset>
       </div>
       <div className="sidebar-content">
-        <label>
-          <p>Choose topic(s):</p>
-          <p>
+        <fieldset>
+          <legend>Choose Topic(s)</legend>
+          <label>
             <select
               name="selectedTopics"
               multiple={true}
@@ -95,12 +100,25 @@ const APICall: React.FC<APICallProps> = ({ geometries }) => {
               <option value="gemarkung">Gemarkung</option>
               <option value="flurstueck">Flurstück</option>
             </select>
-          </p>
-        </label>
+          </label>
+        </fieldset>
       </div>
-      <p>
-        <button onClick={sendGeometryToAPI}>Send geometry to API</button>
-      </p>
+      <div className="sidebar-content">
+        <fieldset>
+          <legend>Set Parameters</legend>
+          <label>
+            <input
+              type="checkbox"
+              checked={returnGeometryChecked}
+              onChange={toggleGeometryCheckbox}
+            />
+            Return Geometry
+          </label>
+        </fieldset>
+      </div>
+      <div className="sidebar-content">
+        <button onClick={sendGeometryToAPI}>Send Geometry to API</button>
+      </div>
       <textarea value={result} readOnly cols={50} rows={15} />
     </div>
   );
