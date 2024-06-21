@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, FeatureGroup, Polygon } from 'react-leaflet';
 import L, { DrawEvents, LatLngExpression } from 'leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import { Feature, Geometry } from 'geojson';
@@ -53,6 +53,22 @@ const Map: React.FC<MapProps> = ({
     }
   };
 
+  const convertToLatLng = (positions: number[][]): LatLngExpression[] => {
+    return positions.map((position) => {
+      return [position[0], position[1]] as LatLngExpression;
+    });
+  };
+
+  const polygonBBPositions: number[][] = [
+    [50.952162, 13.666581],
+    [50.952162, 13.946723],
+    [51.066846, 13.946723],
+    [51.066846, 13.666581],
+  ];
+
+  const polygonPositions: LatLngExpression[] =
+    convertToLatLng(polygonBBPositions);
+
   return (
     <div className="map-container">
       <MapContainer
@@ -64,6 +80,12 @@ const Map: React.FC<MapProps> = ({
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <Polygon
+          positions={polygonPositions}
+          color="gray"
+          fillColor="yellow"
+          fillOpacity={0.1}
         />
         <FeatureGroup ref={featureGroupRef}>
           <EditControl
