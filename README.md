@@ -1,30 +1,46 @@
-# React + TypeScript + Vite
+# Demo map client for GeospatialAnalyzer API
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## General
 
-Currently, two official plugins are available:
+This is a simple demo map client for the [GeospatialAnalyzer API](https://github.com/geobakery/GeospatialAnalyzer). It provides a Leaflet and OpenStreetMap based map to show some integration examples.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+It is built using React, TypeScript, Vite and React Leaflet.
 
-## Expanding the ESLint configuration
+### What is working
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- Show the BB (hardcoded) from the sample data
+- Draw geometries
+- Choose interface
+- Choose topic(s)
+- Set parameters
+- Make an API call
+- Show response
 
-- Configure the top-level `parserOptions` property like this:
+### To do
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+- Selection fields depend on each other
+- Show returned geometry in map
+- Send all geometries to API
+- Add more interfaces, topics and parameters
+- Fine tuning
+
+### Nice to have
+
+- Introduce a config file
+- Dynamically build UI from API capabilities
+- ...
+
+## DEV
+
+Prettier, Linter and HMR are configured. Tested in VS Code.
+
+### Install and run
+
+```
+pnpm install
+pnpm run dev
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Contribution
+
+You are welcome to co-develop :)
