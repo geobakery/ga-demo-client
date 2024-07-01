@@ -15,9 +15,10 @@ const App: React.FC = () => {
       <Map
         initialPosition={initialPosition}
         initialZoom={initialZoom}
+        geometries={geometries}
         setGeometries={setGeometries}
       />
-      <APICall geometries={geometries} />
+      <APICall geometries={geometries} setGeometries={setGeometries} />
     </div>
   );
 };

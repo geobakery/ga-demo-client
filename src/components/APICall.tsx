@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Feature, Geometry } from 'geojson';
+import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 
 interface APICallProps {
   geometries: Feature<Geometry>[];
+  setGeometries: (geometries: Feature<Geometry>[]) => void;
 }
 
-const APICall: React.FC<APICallProps> = ({ geometries }) => {
+const APICall: React.FC<APICallProps> = ({ geometries, setGeometries }) => {
   const [result, setResult] = useState('');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedInterface, setSelectedInterface] = useState<string>('within');
@@ -52,7 +53,7 @@ const APICall: React.FC<APICallProps> = ({ geometries }) => {
       body: JSON.stringify(bodyContent),
     })
       .then((response) => response.json())
-      .then((data) => {
+      .then((data: Feature<Geometry, GeoJsonProperties>[]) => {
         // Process the response
         console.log(
           'Request with interface: ' +
@@ -61,9 +62,15 @@ const APICall: React.FC<APICallProps> = ({ geometries }) => {
             JSON.stringify(bodyContent),
         );
         setResult(JSON.stringify(data, undefined, 4));
+
+        if (returnGeometryChecked === true) {
+          const returnedGeometries: Feature<Geometry>[] = data;
+          setGeometries([...geometries, ...returnedGeometries]);
+          //setGeometries([...returnedGeometries]);
+        }
       })
       .catch((error) => {
-        console.error('Error sending geometry to API:', error);
+        console.error(error);
       });
   };
 

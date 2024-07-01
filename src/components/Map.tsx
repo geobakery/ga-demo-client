@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, FeatureGroup, Polygon } from 'react-leaflet';
 import L, { DrawEvents, LatLngExpression } from 'leaflet';
 import { EditControl } from 'react-leaflet-draw';
@@ -14,12 +14,14 @@ interface MapProps {
   initialPosition: LatLngExpression;
   initialZoom: number;
   setGeometries: (geometries: Feature<Geometry>[]) => void;
+  geometries: Feature<Geometry>[];
 }
 
 const Map: React.FC<MapProps> = ({
   initialPosition,
   initialZoom,
   setGeometries,
+  geometries,
 }) => {
   const featureGroupRef = useRef<L.FeatureGroup>(null);
 
@@ -53,6 +55,17 @@ const Map: React.FC<MapProps> = ({
     }
   };
 
+  useEffect(() => {
+    if (featureGroupRef.current) {
+      featureGroupRef.current.clearLayers();
+      geometries.forEach((geometry) => {
+        const layer = L.geoJSON(geometry);
+        layer.addTo(featureGroupRef.current!);
+        console.log('Returned geometry added to map:', geometry);
+      });
+    }
+  }, [geometries]);
+
   const convertToLatLng = (positions: number[][]): LatLngExpression[] => {
     return positions.map((position) => {
       return [position[0], position[1]] as LatLngExpression;
@@ -84,8 +97,7 @@ const Map: React.FC<MapProps> = ({
         <Polygon
           positions={polygonPositions}
           color="gray"
-          fillColor="yellow"
-          fillOpacity={0.1}
+          fillColor="transparent"
         />
         <FeatureGroup ref={featureGroupRef}>
           <EditControl
