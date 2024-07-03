@@ -15,14 +15,15 @@ It is built using React, TypeScript, Vite and React Leaflet.
 - Set parameters
 - Make an API call
 - Show response
+- Show returned geometry in map
 
 ### To do
 
+- Improve geometry handling
 - Selection fields depend on each other
-- Show returned geometry in map
-- Send all geometries to API
+- Send all drawn geometries to API
 - Add more interfaces, topics and parameters
-- Fine tuning
+- Fine-tuning in general
 
 ### Nice to have
 
@@ -30,7 +31,7 @@ It is built using React, TypeScript, Vite and React Leaflet.
 - Dynamically build UI from API capabilities
 - ...
 
-## DEV
+## Development
 
 Prettier, Linter and HMR are configured. Tested in VS Code.
 
