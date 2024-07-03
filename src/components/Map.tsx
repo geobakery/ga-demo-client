@@ -13,33 +13,37 @@ interface CreatedEvent {
 interface MapProps {
   initialPosition: LatLngExpression;
   initialZoom: number;
-  setGeometries: (geometries: Feature<Geometry>[]) => void;
-  geometries: Feature<Geometry>[];
+  setUserGeometries: (geometries: Feature<Geometry>[]) => void;
+  userGeometries: Feature<Geometry>[];
+  apiGeometries: Feature<Geometry>[];
+  clearGeometries: () => void;
 }
 
 const Map: React.FC<MapProps> = ({
   initialPosition,
   initialZoom,
-  setGeometries,
-  geometries,
+  setUserGeometries,
+  userGeometries,
+  apiGeometries,
+  clearGeometries,
 }) => {
   const featureGroupRef = useRef<L.FeatureGroup>(null);
 
   const onEdited = (e: DrawEvents.Edited) => {
     const layers = e.layers;
-    const geometries: Feature<Geometry>[] = [];
+    const newGeometries: Feature<Geometry>[] = [];
 
     layers.eachLayer((layer: L.Layer) => {
       if ('toGeoJSON' in layer && typeof layer.toGeoJSON === 'function') {
         const geoJson = (layer as L.FeatureGroup).toGeoJSON();
-        geometries.push(geoJson as Feature<Geometry>);
+        newGeometries.push(geoJson as Feature<Geometry>);
       } else {
         console.error('Layer does not support toGeoJSON method');
       }
     });
 
-    console.log('Edited geometries:', geometries);
-    setGeometries(geometries);
+    console.log('Edited geometries:', newGeometries);
+    setUserGeometries(newGeometries);
   };
 
   const onCreated = (e: CreatedEvent) => {
@@ -49,22 +53,28 @@ const Map: React.FC<MapProps> = ({
     if ('toGeoJSON' in layer && typeof layer.toGeoJSON === 'function') {
       const geoJson = (layer as L.FeatureGroup).toGeoJSON();
       console.log('Created geometry:', geoJson);
-      setGeometries([geoJson as Feature<Geometry>]);
+      setUserGeometries([...userGeometries, geoJson as Feature<Geometry>]);
     } else {
       console.error('Layer does not support toGeoJSON method');
     }
   };
 
+  const onDeleted = () => {
+    clearGeometries();
+  };
+
   useEffect(() => {
     if (featureGroupRef.current) {
-      featureGroupRef.current.clearLayers();
-      geometries.forEach((geometry) => {
+      //featureGroupRef.current.clearLayers();
+      //[...userGeometries, ...apiGeometries].forEach((geometry) => {
+      [...apiGeometries].forEach((geometry) => {
         const layer = L.geoJSON(geometry);
         layer.addTo(featureGroupRef.current!);
         console.log('Returned geometry added to map:', geometry);
       });
     }
-  }, [geometries]);
+    //  }, [userGeometries, apiGeometries]);
+  }, [apiGeometries]);
 
   const convertToLatLng = (positions: number[][]): LatLngExpression[] => {
     return positions.map((position) => {
@@ -112,9 +122,11 @@ const Map: React.FC<MapProps> = ({
             }}
             edit={{
               remove: true,
+              edit: false,
             }}
             onEdited={onEdited}
             onCreated={onCreated}
+            onDeleted={onDeleted}
           />
         </FeatureGroup>
       </MapContainer>

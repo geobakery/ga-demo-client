@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 
 interface APICallProps {
-  geometries: Feature<Geometry>[];
-  setGeometries: (geometries: Feature<Geometry>[]) => void;
+  userGeometries: Feature<Geometry>[];
+  addApiGeometries: (geometries: Feature<Geometry>[]) => void;
 }
 
-const APICall: React.FC<APICallProps> = ({ geometries, setGeometries }) => {
+const APICall: React.FC<APICallProps> = ({
+  userGeometries,
+  addApiGeometries,
+}) => {
   const [result, setResult] = useState('');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedInterface, setSelectedInterface] = useState<string>('within');
@@ -31,7 +34,7 @@ const APICall: React.FC<APICallProps> = ({ geometries, setGeometries }) => {
   };
 
   const sendGeometryToAPI = () => {
-    if (geometries.length === 0) {
+    if (userGeometries.length === 0) {
       console.error('No geometries to send');
       setResult('No geometries to send');
       return;
@@ -39,7 +42,7 @@ const APICall: React.FC<APICallProps> = ({ geometries, setGeometries }) => {
 
     const bodyContent = {
       topics: selectedTopics,
-      inputGeometries: geometries,
+      inputGeometries: userGeometries,
       outputFormat: 'geojson',
       returnGeometry: returnGeometryChecked,
       outSRS: 4326,
@@ -63,10 +66,8 @@ const APICall: React.FC<APICallProps> = ({ geometries, setGeometries }) => {
         );
         setResult(JSON.stringify(data, undefined, 4));
 
-        if (returnGeometryChecked === true) {
-          const returnedGeometries: Feature<Geometry>[] = data;
-          setGeometries([...geometries, ...returnedGeometries]);
-          //setGeometries([...returnedGeometries]);
+        if (returnGeometryChecked) {
+          addApiGeometries(data);
         }
       })
       .catch((error) => {
