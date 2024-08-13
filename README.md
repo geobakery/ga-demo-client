@@ -1,10 +1,12 @@
-# Demo map client for GeospatialAnalyzer API
+# Demo Map Client for GeospatialAnalyzer API
 
 ## General
 
 This is a simple demo map client for the [GeospatialAnalyzer API](https://github.com/geobakery/GeospatialAnalyzer). It provides a Leaflet and OpenStreetMap based map to show some integration examples.
 
 It is built using React, TypeScript, Vite and React Leaflet.
+
+![Screenshot Demo Map Client](src/assets/screenshots/app-screenshot-desktop.png)
 
 ### What is working
 
@@ -43,6 +45,8 @@ Prettier, Linter and HMR are configured. Tested in VS Code.
 pnpm install
 pnpm run dev
 ```
+
+Open [http://localhost:5173/](http://localhost:5173/) in your browser.
 
 ## Contribution
 
