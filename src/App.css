@@ -7,15 +7,24 @@
 .map-container {
   flex: 1;
   padding: 20px;
+  min-width: 200px;
 }
 
 .sidebar {
-  flex: 0 0 400px;
+  /*flex: 0 0 400px;*/
   padding: 20px;
 }
 
 .sidebar-content {
   margin-bottom: 14px;
+}
+
+select {
+  width: 100%;
+}
+
+.btn--send-geometry {
+  width: 100%;
 }
 
 @media (prefers-color-scheme: light) {

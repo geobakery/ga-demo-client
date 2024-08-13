@@ -15,10 +15,46 @@ const APICall: React.FC<APICallProps> = ({
   const [selectedInterface, setSelectedInterface] = useState<string>('within');
   const [returnGeometryChecked, setChecked] = React.useState(false);
 
+  const mostlyUsedSpatialTests: string[] = [
+    'within',
+    'intersect',
+    'nearestNeighbour',
+  ];
+
+  const topicInterfaceMapping: Record<string, string[]> = {
+    land: mostlyUsedSpatialTests,
+    kreis: mostlyUsedSpatialTests,
+    gemeinde: mostlyUsedSpatialTests,
+    gemarkung: mostlyUsedSpatialTests,
+    flurstueck: mostlyUsedSpatialTests,
+    schutzgebiet: mostlyUsedSpatialTests,
+    wasserschutzgebiet: mostlyUsedSpatialTests,
+    natura2000_gebiet: mostlyUsedSpatialTests,
+    natura2000_ort: ['intersect', 'nearestNeighbour'],
+    'hohlraum-bergaufsicht': mostlyUsedSpatialTests,
+    'hohlraum-unterirdisch': mostlyUsedSpatialTests,
+    'asp-sperrzone': mostlyUsedSpatialTests,
+    adresse: ['intersect', 'nearestNeighbour'],
+    hoehe: ['valuesAtPoint'],
+    th_verwaltungseinheit: mostlyUsedSpatialTests,
+  };
+
   const handleInterfaceChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
-    setSelectedInterface(event.target.value);
+    const selectedValue = event.target.value;
+    setSelectedInterface(selectedValue);
+
+    // Filter the topics based on the selected interface
+    const filteredTopics = Object.keys(topicInterfaceMapping).filter((topic) =>
+      topicInterfaceMapping[topic].includes(selectedValue),
+    );
+
+    // Update selected topics to only include valid ones
+    const validSelectedTopics = selectedTopics.filter((topic) =>
+      filteredTopics.includes(topic),
+    );
+    setSelectedTopics(validSelectedTopics);
   };
 
   const handleTopicChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -75,6 +111,11 @@ const APICall: React.FC<APICallProps> = ({
       });
   };
 
+  // Get the list of topics that are valid for the selected interface
+  const availableTopics = Object.keys(topicInterfaceMapping).filter((topic) =>
+    topicInterfaceMapping[topic].includes(selectedInterface),
+  );
+
   return (
     <div className="sidebar">
       <h2>API Call</h2>
@@ -84,11 +125,14 @@ const APICall: React.FC<APICallProps> = ({
           <label>
             <select
               name="selectedInterface"
+              value={selectedInterface}
               multiple={false}
               onChange={handleInterfaceChange}
             >
               <option value="within">Within</option>
               <option value="intersect">Intersect</option>
+              <option value="nearestNeighbour">NearestNeighbour</option>
+              <option value="valuesAtPoint">ValuesAtPoint</option>
             </select>
           </label>
         </fieldset>
@@ -100,13 +144,14 @@ const APICall: React.FC<APICallProps> = ({
             <select
               name="selectedTopics"
               multiple={true}
+              value={selectedTopics}
               onChange={handleTopicChange}
             >
-              <option value="land">Land</option>
-              <option value="kreis">Kreis</option>
-              <option value="gemeinde">Gemeinde</option>
-              <option value="gemarkung">Gemarkung</option>
-              <option value="flurstueck">Flurstück</option>
+              {availableTopics.map((topic) => (
+                <option key={topic} value={topic}>
+                  {topic}
+                </option>
+              ))}
             </select>
           </label>
         </fieldset>
@@ -125,7 +170,9 @@ const APICall: React.FC<APICallProps> = ({
         </fieldset>
       </div>
       <div className="sidebar-content">
-        <button onClick={sendGeometryToAPI}>Send Geometry to API</button>
+        <button className="btn--send-geometry" onClick={sendGeometryToAPI}>
+          Send Geometry to API
+        </button>
       </div>
       <textarea value={result} readOnly cols={50} rows={15} />
     </div>
