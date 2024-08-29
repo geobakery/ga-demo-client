@@ -32,6 +32,7 @@ It is built using React, TypeScript, Vite and React Leaflet.
 ### Nice to have
 
 - Introduce a config file
+- Docker deployment capability
 - Dynamically build UI from API capabilities
 - ...
 
@@ -51,3 +52,9 @@ Open [http://localhost:5173/](http://localhost:5173/) in your browser.
 ## Contribution
 
 You are welcome to co-develop :)
+
+## License
+
+This project is licensed under the [GNU General Public License 3 (GPLv3)](./LICENSE).
+
+For information about third-party component licenses, see the [THIRD-PARTY-LICENSES file](./THIRD-PARTY-LICENSES).
