@@ -57,4 +57,4 @@ You are welcome to co-develop :)
 
 This project is licensed under the [GNU General Public License 3 (GPLv3)](./LICENSE).
 
-For information about third-party component licenses, see the [THIRD-PARTY-LICENSES file](./THIRD-PARTY-LICENSES).
+For information about third-party component licenses, see the [THIRD-PARTY-LICENSES file](./THIRD-PARTY-LICENSES.md).
