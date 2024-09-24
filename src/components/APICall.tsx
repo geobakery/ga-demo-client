@@ -117,7 +117,7 @@ const APICall: React.FC<APICallProps> = ({
   );
 
   return (
-    <div className="sidebar">
+    <>
       <h2>API Call</h2>
       <div className="sidebar-content">
         <fieldset>
@@ -129,10 +129,10 @@ const APICall: React.FC<APICallProps> = ({
               multiple={false}
               onChange={handleInterfaceChange}
             >
-              <option value="within">Within</option>
-              <option value="intersect">Intersect</option>
-              <option value="nearestNeighbour">NearestNeighbour</option>
-              <option value="valuesAtPoint">ValuesAtPoint</option>
+              <option className="interfaceOptions" value="within">Within</option>
+              <option className="interfaceOptions" value="intersect">Intersect</option>
+              <option className="interfaceOptions" value="nearestNeighbour">NearestNeighbour</option>
+              <option className="interfaceOptions" value="valuesAtPoint">ValuesAtPoint</option>
             </select>
           </label>
         </fieldset>
@@ -159,14 +159,25 @@ const APICall: React.FC<APICallProps> = ({
       <div className="sidebar-content">
         <fieldset>
           <legend>Set Parameters</legend>
-          <label>
+          <div className="checkbox-returnGeom">
             <input
+              id='cbi-returnGeom'
               type="checkbox"
               checked={returnGeometryChecked}
               onChange={toggleGeometryCheckbox}
             />
-            Return Geometry
+            <label className='cbi' htmlFor="cbi-returnGeom">
+            <div className="flip">
+              <div className="front"></div>
+              <div className="back">
+                <svg width="16" height="14" viewBox="0 0 16 14">
+                  <path d="M2 8.5L6 12.5L14 1.5"></path>
+                </svg>
+              </div>
+          </div>
           </label>
+          </div>
+          <div className='cbi-text'>Return Geometry</div>
         </fieldset>
       </div>
       <div className="sidebar-content">
@@ -174,8 +185,8 @@ const APICall: React.FC<APICallProps> = ({
           Send Geometry to API
         </button>
       </div>
-      <textarea value={result} readOnly cols={50} rows={15} />
-    </div>
+      <div className="sidebar-content"><textarea className="textarea" value={result} readOnly cols={50} rows={15} /></div>
+      </>
   );
 };
 

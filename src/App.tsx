@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { LatLngExpression } from 'leaflet';
+import Header from './components/Header';
 import Map from './components/Map';
 import APICall from './components/APICall';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
@@ -30,6 +31,10 @@ const App: React.FC = () => {
 
   return (
     <div className="app-container">
+      <div className='header'>
+      <Header />
+      </div>
+      <div className='map-container'>
       <Map
         initialPosition={initialPosition}
         initialZoom={initialZoom}
@@ -37,11 +42,12 @@ const App: React.FC = () => {
         setUserGeometries={addUserGeometries}
         apiGeometries={apiGeometries}
         clearGeometries={clearGeometries}
-      />
+      /></div>
+      <div className='sidebar'>
       <APICall
         userGeometries={userGeometries}
         addApiGeometries={addApiGeometries}
-      />
+      /></div>
     </div>
   );
 };

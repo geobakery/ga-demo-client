@@ -93,7 +93,7 @@ const Map: React.FC<MapProps> = ({
     convertToLatLng(polygonBBPositions);
 
   return (
-    <div className="map-container">
+    
       <MapContainer
         center={initialPosition}
         zoom={initialZoom}
@@ -130,7 +130,7 @@ const Map: React.FC<MapProps> = ({
           />
         </FeatureGroup>
       </MapContainer>
-    </div>
+    
   );
 };
 
