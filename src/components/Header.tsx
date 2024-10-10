@@ -9,6 +9,8 @@ const Header = () => {
     <div className='textGesamt'>
         <div className="textG">Geospatial</div>
         <div className="textA">Analyzer</div>
+        <div className="textD"> - Demo Client</div>
+
     </div>
     
     </>

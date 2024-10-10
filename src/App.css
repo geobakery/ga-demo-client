@@ -18,7 +18,7 @@ h2{
 .app-container {
   height:100vh;
   display: grid;
-  grid-template-rows: 80px 70% 20%; 
+  grid-template-rows: 70px 70% 20%; 
   grid-template-columns: 100%; 
   grid-template-areas:  
     "header" 
@@ -27,13 +27,15 @@ h2{
 }
 @media screen and (min-width: 888px) { 
   .app-container { 
-    grid-template-rows: 80px 95%; 
+    grid-template-rows: 80px 93%; 
     grid-template-columns: 75% 25%; 
     grid-template-areas:  
       "header header" 
       "map-container sidebar" 
     ; 
   } 
+
+  
 }
 .header {
   padding-left: 20px;
@@ -41,7 +43,7 @@ h2{
 }
 
 .map-container {
-  padding: 10px;
+  padding: 10px 10px 10px 10px;
   min-width: 200px;
 }
 
