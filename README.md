@@ -19,13 +19,13 @@ It is built using React, TypeScript, Vite and React Leaflet.
 - Make an API call
 - Show response
 - Show returned geometry in map
+- mobile-friendly UI
 
 ### To do
 
 - Improve geometry handling
 - Send all drawn geometries to API
 - Add more interfaces and parameters
-- Make it mobile friendly
 - Fine-tuning in general
 - Update topics when GA is ready
 
