@@ -25,7 +25,7 @@ h2{
     "map-container" 
     "sidebar" 
 }
-@media screen and (min-width: 888px) { 
+@media screen and (min-width: 820px) { 
   .app-container { 
     grid-template-rows: 80px 93%; 
     grid-template-columns: 75% 25%; 
@@ -33,6 +33,21 @@ h2{
       "header header" 
       "map-container sidebar" 
     ; 
+  } 
+
+  
+}
+
+@media screen and (max-width: 470px) { 
+  .app-container {
+  height:100vh;
+  display: grid;
+  grid-template-rows: 40px 70% 20%; 
+  grid-template-columns: 100%; 
+  grid-template-areas:  
+    "header" 
+    "map-container" 
+    "sidebar" ;
   } 
 
   

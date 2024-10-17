@@ -4,7 +4,7 @@ const Header = () => {
   return (
     <>
     <div className="logo">
-        <img src="src/assets/Weltauge_Farbanpassung_ohneSchrift.png" alt="Logo GeospatialAnalyzer" height="50px" width="100px"/>
+        <img src="src/assets/Weltauge_Farbanpassung_ohneSchrift.png" alt="Logo GeospatialAnalyzer" />
     </div>
     <div className='textGesamt'>
         <div className="textG">Geospatial</div>
