@@ -1,57 +1,72 @@
-@font-face {
-font-family: "EauBlack";
-src:url("src/assets/font/eau_sans_bold.ttf");
+.cormorant-logoFontG {
+  font-family: "Cormorant", serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
 }
 
-@font-face {
-font-family: "EauBook";
-src:url("src/assets/font/eau_sans_book.ttf");
+.cormorant-logoFontA {
+  font-family: "Cormorant", serif;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
 }
 
-h2{
+h2 {
   margin: 10px 5px 10px 15px;
 }
-.header {grid-area : header}
-.map-container {grid-area : map-container}
-.sidebar {grid-area : sidebar}
+
+.header {
+  grid-area: header
+}
+
+.map-container {
+  grid-area: map-container
+}
+
+.sidebar {
+  grid-area: sidebar
+}
 
 .app-container {
-  height:100vh;
+  height: 100vh;
   display: grid;
-  grid-template-rows: 70px 70% 20%; 
-  grid-template-columns: 100%; 
-  grid-template-areas:  
-    "header" 
-    "map-container" 
-    "sidebar" 
-}
-@media screen and (min-width: 820px) { 
-  .app-container { 
-    grid-template-rows: 80px 93%; 
-    grid-template-columns: 75% 25%; 
-    grid-template-areas:  
-      "header header" 
-      "map-container sidebar" 
-    ; 
-  } 
-
-  
+  grid-template-rows: 70px 70% 20%;
+  grid-template-columns: 100%;
+  grid-template-areas:
+    "header"
+    "map-container"
+    "sidebar"
 }
 
-@media screen and (max-width: 470px) { 
+@media screen and (min-width: 820px) {
   .app-container {
-  height:100vh;
-  display: grid;
-  grid-template-rows: 40px 70% 20%; 
-  grid-template-columns: 100%; 
-  grid-template-areas:  
-    "header" 
-    "map-container" 
-    "sidebar" ;
-  } 
+    grid-template-rows: 80px 93%;
+    grid-template-columns: 75% 25%;
+    grid-template-areas:
+      "header header"
+      "map-container sidebar"
+    ;
+  }
 
-  
+
 }
+
+@media screen and (max-width: 470px) {
+  .app-container {
+    height: 100vh;
+    display: grid;
+    grid-template-rows: 40px 70% 20%;
+    grid-template-columns: 100%;
+    grid-template-areas:
+      "header"
+      "map-container"
+      "sidebar";
+  }
+
+
+}
+
 .header {
   padding-left: 20px;
   padding-top: 10px;
@@ -78,10 +93,12 @@ select {
   font-size: medium;
   box-shadow: 0 0 2px rgb(204, 204, 204);
 }
-select option{
+
+select option {
   padding: 6px 6px;
 }
-.interfaceOptions{
+
+.interfaceOptions {
   padding: 8px 6px;
 }
 
@@ -101,79 +118,90 @@ select option{
 }
 
 .checkbox-returnGeom {
-    position: relative;
-    float:left;
-    margin-left:10px;
-    font-size: medium;
-  }
+  position: relative;
+  float: left;
+  margin-left: 10px;
+  font-size: medium;
+}
 
-  .checkbox-returnGeom input[type="checkbox"] {
-    display: none;
-    visibility: hidden;
-  }
-  .checkbox-returnGeom .cbi {
-    -webkit-perspective: 20;
-    perspective: 20;
-    display: inline-block;
-    border: 2px solid #e8e8eb;
-    background: #e8e8eb;
-    border-radius: 4px;
-    transform: translate3d(0, 0, 0);
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  .checkbox-returnGeom .cbi:hover {
-    border-color: #218088;
-  }
-  .checkbox-returnGeom .flip {
-    display: block;
-    transition: all 0.4s ease;
-    transform-style: preserve-3d;
-    position: relative;
-    width: 20px;
-    height: 20px;
-  }
-  .checkbox-returnGeom input[type="checkbox"]:checked + .cbi {
-    border-color: #0b76ef;
-  }
-  .checkbox-returnGeom input[type="checkbox"]:checked + .cbi .flip {
-    transform: rotateY(180deg);
-  }
-  .checkbox-returnGeom .front,
-  .checkbox-returnGeom .back {
-    backface-visibility: hidden;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 20px;
-    height: 20px;
-    border-radius: 2px;
-  }
-  .checkbox-returnGeom .front {
-    background: #fff;
-    z-index: 1;
-  }
-  .checkbox-returnGeom .back {
-    transform: rotateY(180deg);
-    background: #218088;
-    text-align: center;
-    color: #fff;
-    line-height: 20px;
-    box-shadow: 0 0 0 1px #218088;
-  }
-  .checkbox-returnGeom .back svg {
-    margin-top: 3px;
-    fill: none;
-  }
-  .checkbox-returnGeom .back svg path {
-    stroke: #fff;
-    stroke-width: 2.5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .cbi-text {
-    float:left;
-    text-indent: 20px;
-    font-weight: 400;
-    
-  }
+.checkbox-returnGeom input[type="checkbox"] {
+  display: none;
+  visibility: hidden;
+}
+
+.checkbox-returnGeom .cbi {
+  -webkit-perspective: 20;
+  perspective: 20;
+  display: inline-block;
+  border: 2px solid #e8e8eb;
+  background: #e8e8eb;
+  border-radius: 4px;
+  transform: translate3d(0, 0, 0);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.checkbox-returnGeom .cbi:hover {
+  border-color: #218088;
+}
+
+.checkbox-returnGeom .flip {
+  display: block;
+  transition: all 0.4s ease;
+  transform-style: preserve-3d;
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.checkbox-returnGeom input[type="checkbox"]:checked+.cbi {
+  border-color: #0b76ef;
+}
+
+.checkbox-returnGeom input[type="checkbox"]:checked+.cbi .flip {
+  transform: rotateY(180deg);
+}
+
+.checkbox-returnGeom .front,
+.checkbox-returnGeom .back {
+  backface-visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+}
+
+.checkbox-returnGeom .front {
+  background: #fff;
+  z-index: 1;
+}
+
+.checkbox-returnGeom .back {
+  transform: rotateY(180deg);
+  background: #218088;
+  text-align: center;
+  color: #fff;
+  line-height: 20px;
+  box-shadow: 0 0 0 1px #218088;
+}
+
+.checkbox-returnGeom .back svg {
+  margin-top: 3px;
+  fill: none;
+}
+
+.checkbox-returnGeom .back svg path {
+  stroke: #fff;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cbi-text {
+  float: left;
+  text-indent: 20px;
+  font-weight: 400;
+
+}
