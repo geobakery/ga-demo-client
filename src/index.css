@@ -96,14 +96,12 @@ button:focus-visible {
 .textG {
   float: left;
   padding: 7px 5px 20px 40px;
-  font-family: EauBlack;
   font-size: 40px;
 }
 
 .textA {
   float: left;
   padding: 8px 15px 20px 0px;
-  font-family: EauBold;
   font-size: 40px;
 }
 

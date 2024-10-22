@@ -1,12 +1,24 @@
+@font-face {
+  font-family: 'FigTreeBold';
+  /* Gewünschter Name */
+  src: url('src/assets/font/FigTree-Bold.ttf');
+}
+
+@font-face {
+  font-family: 'FigTreeLight';
+  /* Gewünschter Name */
+  src: url('src/assets/font/FigTree-Light.ttf');
+}
+
 .cormorant-logoFontG {
-  font-family: "Cormorant", serif;
+  font-family: "FigTreeBold", serif;
   font-optical-sizing: auto;
   font-weight: 700;
   font-style: normal;
 }
 
 .cormorant-logoFontA {
-  font-family: "Cormorant", serif;
+  font-family: "FigTreeLight", serif;
   font-optical-sizing: auto;
   font-weight: 300;
   font-style: normal;
