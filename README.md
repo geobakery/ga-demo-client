@@ -19,6 +19,7 @@ It is built using React, TypeScript, Vite and React Leaflet.
 - Make an API call
 - Show response
 - Show returned geometry in map
+- Docker deployment
 
 ### To do
 
@@ -32,7 +33,6 @@ It is built using React, TypeScript, Vite and React Leaflet.
 ### Nice to have
 
 - Introduce a config file
-- Docker deployment capability
 - Dynamically build UI from API capabilities
 - ...
 
@@ -48,6 +48,24 @@ pnpm run dev
 ```
 
 Open [http://localhost:5173/](http://localhost:5173/) in your browser.
+
+## Docker Deployment
+
+### Create the Docker Image
+
+This command builds the Docker image from the Dockerfile and tags it as `ga-client`.
+
+```
+docker build -t ga-client .
+```
+
+### Run the Docker Image
+
+This command runs the previously built image as a container and exposes it on port 80.
+
+```
+docker run -p 80:80 ga-client
+```
 
 ## Contribution
 
