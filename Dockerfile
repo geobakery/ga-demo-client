@@ -7,6 +7,8 @@ RUN npm install --global pnpm && pnpm install
 
 COPY . .
 
+COPY .env ./
+
 RUN pnpm run build
 
 FROM nginx:alpine

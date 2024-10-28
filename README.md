@@ -10,7 +10,7 @@ It is built using React, TypeScript, Vite and React Leaflet.
 
 ### What is working
 
-- Show the BB (hardcoded) from the sample data
+- Show the bounding box (hardcoded) from the sample data
 - Draw geometries
 - Choose interface
 - Choose topic(s)
@@ -29,12 +29,11 @@ It is built using React, TypeScript, Vite and React Leaflet.
 - Make it mobile friendly
 - Fine-tuning in general
 - Update topics when GA is ready
+- Introduce a config file for interfaces, topics, bounding box and so on
 
-### Nice to have
+## Configuration
 
-- Introduce a config file
-- Dynamically build UI from API capabilities
-- ...
+Before running the application, you need to create a `.env` file to configure your environment variables. You can use the provided `.env.example` file as a template.
 
 ## Development
 
