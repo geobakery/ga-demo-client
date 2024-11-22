@@ -2,7 +2,7 @@
 
 ## React
 
-__MIT License__
+**MIT License**
 
 Copyright (c) Meta Platforms, Inc. and affiliates.
 
@@ -14,7 +14,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ## Leaflet
 
-__BSD 2-Clause License__
+**BSD 2-Clause License**
 
 Copyright (c) 2010-2024, Volodymyr Agafonkin  
 Copyright (c) 2010-2011, CloudMade  
@@ -30,7 +30,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS“ AN
 
 ## React-Leaflet
 
-__Hippocratic License__
+**Hippocratic License**
 
 Copyright 2020 Paul Le Cam and contributors  
 Hippocratic License Version Number: 2.1.
