@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 const apiUrl = import.meta.env.VITE_API_URL;
-const apiPort = import.meta.env.VITE_API_PORT ? `:${import.meta.env.VITE_API_PORT}` : '';
-const apiVersion = import.meta.env.VITE_API_VERSION ? `/${import.meta.env.VITE_API_VERSION}` : '';
+const apiPort = import.meta.env.VITE_API_PORT
+  ? `:${import.meta.env.VITE_API_PORT}`
+  : '';
+const apiVersion = import.meta.env.VITE_API_VERSION
+  ? `/${import.meta.env.VITE_API_VERSION}`
+  : '';
 
 interface APICallProps {
   userGeometries: Feature<Geometry>[];
