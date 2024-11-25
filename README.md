@@ -14,8 +14,8 @@ It is built using React, TypeScript, Vite and React Leaflet.
 - Draw geometries
 - Choose interface
 - Choose topic(s)
-- Selection fields for interface and topics depend on each other
 - Set parameters
+- Selection fields for interface, topics and parameters depend on each other
 - Make an API call
 - Show response
 - Show returned geometry in map
@@ -24,8 +24,7 @@ It is built using React, TypeScript, Vite and React Leaflet.
 ### To do
 
 - Improve geometry handling
-- Send all drawn geometries to API
-- Add more interfaces and parameters
+- Send more than one geometry to API
 - Make it mobile friendly
 - Fine-tuning in general
 - Update topics when GA is ready

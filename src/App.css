@@ -23,6 +23,15 @@ select {
   width: 100%;
 }
 
+#count,
+#maxDistanceToNeighbour {
+  width: 6em;
+}
+
+.lbl--parameter {
+  margin-left: 5px;
+}
+
 .btn--send-geometry {
   width: 100%;
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 const apiUrl = import.meta.env.VITE_API_URL;
 const apiPort = import.meta.env.VITE_API_PORT
@@ -20,7 +20,9 @@ const APICall: React.FC<APICallProps> = ({
   const [result, setResult] = useState('');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedInterface, setSelectedInterface] = useState<string>('within');
-  const [returnGeometryChecked, setChecked] = React.useState(false);
+  const [returnGeometryChecked, setReturnGeometryChecked] =
+    React.useState(true);
+  const [activeParameters, setActiveParameters] = useState<string[]>([]);
 
   const mostlyUsedSpatialTests: string[] = [
     'within',
@@ -46,22 +48,69 @@ const APICall: React.FC<APICallProps> = ({
     th_verwaltungseinheit: mostlyUsedSpatialTests,
   };
 
+  const interfaceParameterMapping: Record<string, string[]> = {
+    within: ['returnGeometry'],
+    intersect: ['returnGeometry'],
+    nearestNeighbour: ['returnGeometry', 'count', 'maxDistanceToNeighbour'],
+    valuesAtPoint: [],
+  };
+
+  interface ParameterValues {
+    count?: number;
+    maxDistanceToNeighbour?: number;
+    returnGeometry?: boolean;
+  }
+
+  const [parameterValues, setParameterValues] = useState<ParameterValues>({});
+
+  // Init parameters
+  useEffect(() => {
+    setActiveParameters(interfaceParameterMapping[selectedInterface]);
+  }, [selectedInterface]);
+
+  // Change parameter state automaticly
+  const handleParameterChange = (key: string, value: string | number) => {
+    setParameterValues((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
   const handleInterfaceChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     const selectedValue = event.target.value;
     setSelectedInterface(selectedValue);
 
-    // Filter the topics based on the selected interface
+    const parameters = interfaceParameterMapping[selectedValue];
+    setActiveParameters(parameters);
+
+    // Set standard paramter for new interface
+    const updatedParameterValues: Record<string, unknown> = {};
+    parameters.forEach((param) => {
+      if (param === 'returnGeometry') {
+        updatedParameterValues[param] = true;
+        setReturnGeometryChecked(true);
+      } else if (param === 'count') {
+        updatedParameterValues[param] = 5;
+      } else if (param === 'maxDistanceToNeighbour') {
+        updatedParameterValues[param] = 2000;
+      }
+    });
+    setParameterValues(updatedParameterValues);
+
+    // Set 'returnGeometryChecked' to false for 'valuesAtPoint'
+    if (selectedValue === 'valuesAtPoint') {
+      setReturnGeometryChecked(false);
+    }
+
+    // Filter topics
     const filteredTopics = Object.keys(topicInterfaceMapping).filter((topic) =>
       topicInterfaceMapping[topic].includes(selectedValue),
     );
-
-    // Update selected topics to only include valid ones
-    const validSelectedTopics = selectedTopics.filter((topic) =>
-      filteredTopics.includes(topic),
+    setSelectedTopics(
+      selectedTopics.filter((topic) => filteredTopics.includes(topic)),
     );
-    setSelectedTopics(validSelectedTopics);
   };
 
   const handleTopicChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -73,22 +122,46 @@ const APICall: React.FC<APICallProps> = ({
   };
 
   const toggleGeometryCheckbox = () => {
-    setChecked(!returnGeometryChecked);
+    const newValue = !returnGeometryChecked;
+    setReturnGeometryChecked(newValue);
+
+    setParameterValues((prev) => ({
+      ...prev,
+      returnGeometry: newValue,
+    }));
   };
 
   const sendGeometryToAPI = () => {
     if (userGeometries.length === 0) {
       console.error('No geometries to send');
-      setResult('No geometries to send');
+      setResult('No geometries to send. Please draw one.');
       return;
     }
 
-    const bodyContent = {
+    // Only allow point geometry for 'valuesAtPoint'
+    let inputGeometries = userGeometries;
+
+    if (selectedInterface === 'valuesAtPoint') {
+      inputGeometries = userGeometries.filter(
+        (geometry) => geometry.geometry.type === 'Point',
+      );
+
+      if (inputGeometries.length === 0) {
+        console.error('ValuesAtPoint requires a point geometry');
+        setResult(
+          'ValuesAtPoint requires a point geometry. Please draw a marker.',
+        );
+        return;
+      }
+    }
+
+    const bodyContent: Record<string, unknown> = {
       topics: selectedTopics,
       inputGeometries: userGeometries,
       outputFormat: 'geojson',
       returnGeometry: returnGeometryChecked,
       outSRS: 4326,
+      ...parameterValues, // Insert dynamic parameters
     };
 
     const url = `${apiUrl}${apiPort}${apiVersion}/${selectedInterface}`;
@@ -104,10 +177,7 @@ const APICall: React.FC<APICallProps> = ({
       .then((data: Feature<Geometry, GeoJsonProperties>[]) => {
         // Process the response
         console.log(
-          'Request with interface: ' +
-            JSON.stringify(selectedInterface) +
-            ' and body: ' +
-            JSON.stringify(bodyContent),
+          `Sending request using interface ${JSON.stringify(selectedInterface)} and body ${JSON.stringify(bodyContent)}`,
         );
         setResult(JSON.stringify(data, undefined, 4));
 
@@ -168,14 +238,55 @@ const APICall: React.FC<APICallProps> = ({
       <div className="sidebar-content">
         <fieldset>
           <legend>Set Parameters</legend>
-          <label>
-            <input
-              type="checkbox"
-              checked={returnGeometryChecked}
-              onChange={toggleGeometryCheckbox}
-            />
-            Return Geometry
-          </label>
+          {activeParameters.includes('returnGeometry') && (
+            <div>
+              <input
+                id="returnGeometry"
+                type="checkbox"
+                checked={returnGeometryChecked}
+                onChange={toggleGeometryCheckbox}
+              />
+              <label htmlFor="returnGeometry">Return Geometry</label>
+            </div>
+          )}
+
+          {activeParameters.includes('count') && (
+            <div>
+              <input
+                id="count"
+                type="number"
+                value={parameterValues.count ?? 5}
+                onChange={(e) =>
+                  handleParameterChange('count', Number(e.target.value))
+                }
+              />
+              <label htmlFor="count" className="lbl--parameter">
+                Count
+              </label>
+            </div>
+          )}
+
+          {activeParameters.includes('maxDistanceToNeighbour') && (
+            <div>
+              <input
+                id="maxDistanceToNeighbour"
+                type="number"
+                value={parameterValues.maxDistanceToNeighbour ?? 2000}
+                onChange={(e) =>
+                  handleParameterChange(
+                    'maxDistanceToNeighbour',
+                    Number(e.target.value),
+                  )
+                }
+              />
+              <label
+                htmlFor="maxDistanceToNeighbour"
+                className="lbl--parameter"
+              >
+                Max Distance to Neighbour (meters)
+              </label>
+            </div>
+          )}
         </fieldset>
       </div>
       <div className="sidebar-content">
