@@ -2,8 +2,8 @@ FROM node:20 AS build
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install --global pnpm && pnpm install
+COPY package*.json pnpm-lock.yaml ./
+RUN npm install --global pnpm && pnpm install --frozen-lockfile
 
 COPY . .
 
