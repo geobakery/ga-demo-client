@@ -62,7 +62,7 @@ docker build -t ga-client .
 This command runs the previously built image as a container and exposes it on port 80.
 
 ```
-docker run -p 80:80 ga-client
+docker run -p 80:8080 ga-client
 ```
 
 ## Contribution

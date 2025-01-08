@@ -11,12 +11,20 @@ COPY .env ./
 
 RUN pnpm run build
 
-FROM nginx:alpine
+FROM nginxinc/nginx-unprivileged:alpine
 
-COPY --from=build /app/dist /usr/share/nginx/html
+WORKDIR /usr/share/nginx/html
 
-COPY node_modules/leaflet/dist/images /usr/share/nginx/html
+COPY --from=build /app/dist ./
 
-EXPOSE 80
+COPY node_modules/leaflet/dist/images ./
+
+ARG APP_UID=1001
+ARG APP_GID=1001
+
+RUN addgroup -g ${APP_GID} appgroup || echo "Group already exists" && \
+    adduser -u ${APP_UID} -G appgroup -s /bin/sh -D appuser || echo "User already exists"
+
+USER ${APP_UID}
 
 CMD ["nginx", "-g", "daemon off;"]
