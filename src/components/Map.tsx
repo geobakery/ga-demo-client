@@ -68,7 +68,9 @@ const Map: React.FC<MapProps> = ({
       //featureGroupRef.current.clearLayers();
       //[...userGeometries, ...apiGeometries].forEach((geometry) => {
       [...apiGeometries].forEach((geometry) => {
-        const layer = L.geoJSON(geometry);
+        const layer = L.geoJSON(geometry, {
+          style: { color: 'coral' },
+        });
         layer.addTo(featureGroupRef.current!);
         console.log('Returned geometry added to map:', geometry);
       });
