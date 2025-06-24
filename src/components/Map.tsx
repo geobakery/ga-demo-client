@@ -6,6 +6,14 @@ import { Feature, Geometry } from 'geojson';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
+// Fix Leaflet default icons for build
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: '/ga-client/images/marker-icon-2x.png',
+  iconUrl: '/ga-client/images/marker-icon.png',
+  shadowUrl: '/ga-client/images/marker-shadow.png',
+});
+
 interface CreatedEvent {
   layer: L.Layer;
 }
