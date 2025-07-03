@@ -7,7 +7,8 @@ RUN npm install --global pnpm && pnpm install --frozen-lockfile
 
 COPY . .
 
-COPY .env ./
+# Build argument for API URL
+ARG VITE_API_URL="http://localhost:3000/v1"
 
 RUN pnpm run build
 
