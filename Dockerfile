@@ -1,4 +1,4 @@
-FROM node:22-alpine AS build
+FROM node:24-alpine AS build
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ ARG VITE_API_URL="http://localhost:3000/v1"
 
 RUN pnpm run build
 
-FROM nginxinc/nginx-unprivileged:alpine
+FROM nginxinc/nginx-unprivileged:alpine-slim
 
 WORKDIR /usr/share/nginx/html/ga-client/
 
