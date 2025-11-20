@@ -24,10 +24,8 @@ It is built using React, TypeScript, Vite and React Leaflet.
 ### To do
 
 - Improve geometry handling
-- Send more than one geometry to API
 - Make it mobile friendly
 - Fine-tuning in general
-- Update topics when GA is ready
 - Introduce a config file for interfaces, topics, bounding box and so on
 
 ## Configuration
@@ -59,7 +57,7 @@ docker build -t ga-client .
 
 ### Run the Docker Image
 
-This command runs the previously built image as a container and exposes it on port 80.
+This command runs the previously built image as a container and exposes it on port `80`.
 
 ```
 docker run -p 80:8080 ga-client
