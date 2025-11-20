@@ -25,21 +25,21 @@ const APICall: React.FC<APICallProps> = ({
   ];
 
   const topicInterfaceMapping: Record<string, string[]> = {
-    land: mostlyUsedSpatialTests,
-    kreis: mostlyUsedSpatialTests,
-    gemeinde: mostlyUsedSpatialTests,
-    gemarkung: mostlyUsedSpatialTests,
-    flurstueck: mostlyUsedSpatialTests,
-    schutzgebiet: mostlyUsedSpatialTests,
-    wasserschutzgebiet: mostlyUsedSpatialTests,
-    natura2000_gebiet: mostlyUsedSpatialTests,
-    natura2000_ort: ['intersect', 'nearestNeighbour'],
-    'hohlraum-bergaufsicht': mostlyUsedSpatialTests,
-    'hohlraum-unterirdisch': mostlyUsedSpatialTests,
-    'asp-sperrzone': mostlyUsedSpatialTests,
-    adresse: ['intersect', 'nearestNeighbour'],
-    hoehe: ['valuesAtPoint'],
-    th_verwaltungseinheit: mostlyUsedSpatialTests,
+    land_f: mostlyUsedSpatialTests,
+    kreis_f: mostlyUsedSpatialTests,
+    gemeinde_f: mostlyUsedSpatialTests,
+    gemarkung_f: mostlyUsedSpatialTests,
+    flurstueck_f: mostlyUsedSpatialTests,
+    schutzgebiet_f: mostlyUsedSpatialTests,
+    wasserschutzgebiet_f: mostlyUsedSpatialTests,
+    natura2000_f: mostlyUsedSpatialTests,
+    natura2000_p: ['intersect', 'nearestNeighbour'],
+    hohlraumbergaufsicht_f: mostlyUsedSpatialTests,
+    hohlraumunterirdisch_f: mostlyUsedSpatialTests,
+    aspsperrzone_f: mostlyUsedSpatialTests,
+    adresse_p: ['intersect', 'nearestNeighbour'],
+    hoehe_r: ['valuesAtPoint'],
+    th_verwaltungseinheit_f: mostlyUsedSpatialTests,
   };
 
   const interfaceParameterMapping: Record<string, string[]> = {
