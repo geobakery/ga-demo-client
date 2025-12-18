@@ -45,7 +45,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: "VITE_API_URL=/v1" # assumes geospatialanalyzer is deployed to the same host on the root route
+          build-args: "VITE_API_URL=/ga/v1" # assumes geospatialanalyzer is deployed to the same host with the url prefix /ga
 
       - name: Generate SBOM
         uses: anchore/sbom-action@v0
