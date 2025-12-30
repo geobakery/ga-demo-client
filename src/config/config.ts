@@ -1,12 +1,3 @@
-// Default spatial tests used by topics
-export const DEFAULT_SPATIAL_TESTS = [
-  'within',
-  'intersect',
-  'nearestNeighbour',
-] as const;
-export const POINT_SPATIAL_TESTS = ['intersect', 'nearestNeighbour'] as const;
-export const RASTER_SPATIAL_TESTS = ['valuesAtPoint'] as const;
-
 // Supported interfaces
 export const INTERFACES = [
   'within',
@@ -15,7 +6,16 @@ export const INTERFACES = [
   'valuesAtPoint',
 ] as const;
 
-// Default interface shown in the UI
+// Spatial tests used by topics
+export const DEFAULT_SPATIAL_TESTS = [
+  'within',
+  'intersect',
+  'nearestNeighbour',
+] as const;
+export const POINT_SPATIAL_TESTS = ['intersect', 'nearestNeighbour'] as const;
+export const RASTER_SPATIAL_TESTS = ['valuesAtPoint'] as const;
+
+// Interface shown on application start
 export const DEFAULT_INTERFACE = 'within';
 
 // Mapping of interfaces to their parameters
@@ -40,14 +40,6 @@ export const INTERFACE_DEFAULT_PARAMETERS: Record<
   },
   valuesAtPoint: {},
 };
-
-// Bounding box polygon shown in the map
-export const BOUNDING_BOX: number[][] = [
-  [50.952162, 13.666581],
-  [50.952162, 13.946723],
-  [51.066846, 13.946723],
-  [51.066846, 13.666581],
-];
 
 // Mapping of topics to supported interfaces
 export const topicInterfaceMapping: Record<string, string[]> = {
@@ -86,3 +78,21 @@ export const TOPIC_LABELS: Record<string, string> = {
   hoehe_r: 'Höhe',
   th_verwaltungseinheit_f: 'Thüringer Verwaltungseinheit',
 };
+
+// Initial map view
+export const INITIAL_POSITION: [number, number] = [51.009504, 13.806652];
+export const INITIAL_ZOOM = 13;
+
+// Bounding box polygon shown in the map
+export const BOUNDING_BOX: number[][] = [
+  [50.952162, 13.666581],
+  [50.952162, 13.946723],
+  [51.066846, 13.946723],
+  [51.066846, 13.666581],
+];
+
+// Basemap (tile layer) configuration
+export const TILE_LAYER_URL =
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+export const TILE_LAYER_ATTRIBUTION =
+  '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors';

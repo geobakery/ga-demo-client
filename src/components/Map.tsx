@@ -3,7 +3,11 @@ import { MapContainer, TileLayer, FeatureGroup, Polygon } from 'react-leaflet';
 import L, { DrawEvents, LatLngExpression } from 'leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import { Feature, Geometry } from 'geojson';
-import { BOUNDING_BOX } from '../config/config';
+import {
+  BOUNDING_BOX,
+  TILE_LAYER_URL,
+  TILE_LAYER_ATTRIBUTION,
+} from '../config/config';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
@@ -103,10 +107,7 @@ const Map: React.FC<MapProps> = ({
         scrollWheelZoom={true}
         style={{ height: '100%', width: '100%' }}
       >
-        <TileLayer
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        <TileLayer attribution={TILE_LAYER_ATTRIBUTION} url={TILE_LAYER_URL} />
         <Polygon
           positions={polygonPositions}
           color="gray"
