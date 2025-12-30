@@ -163,7 +163,7 @@ const APICall: React.FC<APICallProps> = ({
 
   return (
     <div className="sidebar">
-      <h2>API Call</h2>
+      <h2>GeospatialAnalyzer API Call</h2>
       <div className="sidebar-content">
         <fieldset>
           <legend>Choose Interface</legend>
