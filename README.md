@@ -8,29 +8,24 @@ It is built using React, TypeScript, Vite and React Leaflet.
 
 ![Screenshot Demo Map Client](src/assets/screenshots/app-screenshot-desktop.png)
 
-### What is working
+### Features
 
-- Show the bounding box (hardcoded) from the sample data
 - Draw geometries
 - Choose interface
 - Choose topic(s)
-- Set parameters
-- Selection fields for interface, topics and parameters depend on each other
+- Set some API-supported parameters
 - Make an API call
 - Show response
 - Show returned geometry in map
-- Docker deployment
-
-### To do
-
-- Improve geometry handling
-- Make it mobile friendly
-- Fine-tuning in general
-- Introduce a config file for interfaces, topics, bounding box and so on
+- Config file for topics and other settings
+- Show the bounding box (hardcoded) from the sample data
+- Docker/Podman deployment
 
 ## Configuration
 
 Before running the application, you need to create a `.env` file to configure your environment variables. You can use the provided `.env.example` file as a template.
+
+You can customize the topics, bounding box, and other settings in `src/config/config.ts`.
 
 ## Development
 

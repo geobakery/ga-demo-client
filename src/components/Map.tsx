@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, FeatureGroup, Polygon } from 'react-leaflet';
 import L, { DrawEvents, LatLngExpression } from 'leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import { Feature, Geometry } from 'geojson';
+import { BOUNDING_BOX } from '../config/config';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
@@ -92,15 +93,7 @@ const Map: React.FC<MapProps> = ({
     });
   };
 
-  const polygonBBPositions: number[][] = [
-    [50.952162, 13.666581],
-    [50.952162, 13.946723],
-    [51.066846, 13.946723],
-    [51.066846, 13.666581],
-  ];
-
-  const polygonPositions: LatLngExpression[] =
-    convertToLatLng(polygonBBPositions);
+  const polygonPositions: LatLngExpression[] = convertToLatLng(BOUNDING_BOX);
 
   return (
     <div className="map-container">

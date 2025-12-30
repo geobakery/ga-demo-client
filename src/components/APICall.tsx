@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
+import {
+  topicInterfaceMapping,
+  INTERFACE_PARAMETER_MAPPING,
+  INTERFACE_DEFAULT_PARAMETERS,
+  INTERFACES,
+  DEFAULT_INTERFACE,
+  TOPIC_LABELS,
+} from '../config/config';
 const apiUrl = import.meta.env.VITE_API_URL;
 
 interface APICallProps {
@@ -13,41 +21,11 @@ const APICall: React.FC<APICallProps> = ({
 }) => {
   const [result, setResult] = useState('');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  const [selectedInterface, setSelectedInterface] = useState<string>('within');
+  const [selectedInterface, setSelectedInterface] =
+    useState<string>(DEFAULT_INTERFACE);
   const [returnGeometryChecked, setReturnGeometryChecked] =
     React.useState(true);
   const [activeParameters, setActiveParameters] = useState<string[]>([]);
-
-  const mostlyUsedSpatialTests: string[] = [
-    'within',
-    'intersect',
-    'nearestNeighbour',
-  ];
-
-  const topicInterfaceMapping: Record<string, string[]> = {
-    land_f: mostlyUsedSpatialTests,
-    kreis_f: mostlyUsedSpatialTests,
-    gemeinde_f: mostlyUsedSpatialTests,
-    gemarkung_f: mostlyUsedSpatialTests,
-    flurstueck_f: mostlyUsedSpatialTests,
-    schutzgebiet_f: mostlyUsedSpatialTests,
-    wasserschutzgebiet_f: mostlyUsedSpatialTests,
-    natura2000_f: mostlyUsedSpatialTests,
-    natura2000_p: ['intersect', 'nearestNeighbour'],
-    hohlraumbergaufsicht_f: mostlyUsedSpatialTests,
-    hohlraumunterirdisch_f: mostlyUsedSpatialTests,
-    aspsperrzone_f: mostlyUsedSpatialTests,
-    adresse_p: ['intersect', 'nearestNeighbour'],
-    hoehe_r: ['valuesAtPoint'],
-    th_verwaltungseinheit_f: mostlyUsedSpatialTests,
-  };
-
-  const interfaceParameterMapping: Record<string, string[]> = {
-    within: ['returnGeometry'],
-    intersect: ['returnGeometry'],
-    nearestNeighbour: ['returnGeometry', 'count', 'maxDistanceToNeighbour'],
-    valuesAtPoint: [],
-  };
 
   interface ParameterValues {
     count?: number;
@@ -59,7 +37,7 @@ const APICall: React.FC<APICallProps> = ({
 
   // Init parameters
   useEffect(() => {
-    setActiveParameters(interfaceParameterMapping[selectedInterface]);
+    setActiveParameters(INTERFACE_PARAMETER_MAPPING[selectedInterface] ?? []);
   }, [selectedInterface]);
 
   // Change parameter state automaticly
@@ -76,25 +54,19 @@ const APICall: React.FC<APICallProps> = ({
     const selectedValue = event.target.value;
     setSelectedInterface(selectedValue);
 
-    const parameters = interfaceParameterMapping[selectedValue];
+    const parameters = INTERFACE_PARAMETER_MAPPING[selectedValue] ?? [];
     setActiveParameters(parameters);
 
-    // Set standard paramter for new interface
-    const updatedParameterValues: Record<string, unknown> = {};
-    parameters.forEach((param) => {
-      if (param === 'returnGeometry') {
-        updatedParameterValues[param] = true;
-        setReturnGeometryChecked(true);
-      } else if (param === 'count') {
-        updatedParameterValues[param] = 5;
-      } else if (param === 'maxDistanceToNeighbour') {
-        updatedParameterValues[param] = 2000;
-      }
-    });
-    setParameterValues(updatedParameterValues);
+    // Use default parameter values from config
+    const defaults = INTERFACE_DEFAULT_PARAMETERS[selectedValue] ?? {};
+    setParameterValues(defaults);
 
-    // Set 'returnGeometryChecked' to false for 'valuesAtPoint'
-    if (selectedValue === 'valuesAtPoint') {
+    if ('returnGeometry' in defaults) {
+      const dg = defaults as Record<string, unknown>;
+      if (dg.returnGeometry !== undefined) {
+        setReturnGeometryChecked(Boolean(dg.returnGeometry));
+      }
+    } else if (selectedValue === 'valuesAtPoint') {
       setReturnGeometryChecked(false);
     }
 
@@ -202,10 +174,11 @@ const APICall: React.FC<APICallProps> = ({
               multiple={false}
               onChange={handleInterfaceChange}
             >
-              <option value="within">Within</option>
-              <option value="intersect">Intersect</option>
-              <option value="nearestNeighbour">NearestNeighbour</option>
-              <option value="valuesAtPoint">ValuesAtPoint</option>
+              {INTERFACES.map((iface) => (
+                <option key={iface} value={iface}>
+                  {iface}
+                </option>
+              ))}
             </select>
           </label>
         </fieldset>
@@ -222,7 +195,7 @@ const APICall: React.FC<APICallProps> = ({
             >
               {availableTopics.map((topic) => (
                 <option key={topic} value={topic}>
-                  {topic}
+                  {TOPIC_LABELS[topic] ?? topic}
                 </option>
               ))}
             </select>
