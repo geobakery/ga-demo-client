@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import {
-  topicInterfaceMapping,
+  INTERFACES,
   INTERFACE_PARAMETER_MAPPING,
   INTERFACE_DEFAULT_PARAMETERS,
-  INTERFACES,
   DEFAULT_INTERFACE,
-  TOPIC_LABELS,
+  TOPICS,
 } from '../config/config';
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -71,8 +70,8 @@ const APICall: React.FC<APICallProps> = ({
     }
 
     // Filter topics
-    const filteredTopics = Object.keys(topicInterfaceMapping).filter((topic) =>
-      topicInterfaceMapping[topic].includes(selectedValue),
+    const filteredTopics = Object.keys(TOPICS).filter((topic) =>
+      TOPICS[topic].interfaces.includes(selectedValue),
     );
     setSelectedTopics(
       selectedTopics.filter((topic) => filteredTopics.includes(topic)),
@@ -157,8 +156,8 @@ const APICall: React.FC<APICallProps> = ({
   };
 
   // Get the list of topics that are valid for the selected interface
-  const availableTopics = Object.keys(topicInterfaceMapping).filter((topic) =>
-    topicInterfaceMapping[topic].includes(selectedInterface),
+  const availableTopics = Object.keys(TOPICS).filter((topic) =>
+    TOPICS[topic].interfaces.includes(selectedInterface),
   );
 
   return (
@@ -195,7 +194,7 @@ const APICall: React.FC<APICallProps> = ({
             >
               {availableTopics.map((topic) => (
                 <option key={topic} value={topic}>
-                  {TOPIC_LABELS[topic] ?? topic}
+                  {TOPICS[topic].label ?? topic}
                 </option>
               ))}
             </select>

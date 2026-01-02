@@ -41,43 +41,55 @@ export const INTERFACE_DEFAULT_PARAMETERS: Record<
   valuesAtPoint: {},
 };
 
-// Mapping of topics to supported interfaces
-export const topicInterfaceMapping: Record<string, string[]> = {
-  land_f: [...DEFAULT_SPATIAL_TESTS],
-  kreis_f: [...DEFAULT_SPATIAL_TESTS],
-  gemeinde_f: [...DEFAULT_SPATIAL_TESTS],
-  gemarkung_f: [...DEFAULT_SPATIAL_TESTS],
-  flurstueck_f: [...DEFAULT_SPATIAL_TESTS],
-  schutzgebiet_f: [...DEFAULT_SPATIAL_TESTS],
-  wasserschutzgebiet_f: [...DEFAULT_SPATIAL_TESTS],
-  natura2000_f: [...DEFAULT_SPATIAL_TESTS],
-  natura2000_p: [...POINT_SPATIAL_TESTS],
-  hohlraumbergaufsicht_f: [...DEFAULT_SPATIAL_TESTS],
-  hohlraumunterirdisch_f: [...DEFAULT_SPATIAL_TESTS],
-  aspsperrzone_f: [...DEFAULT_SPATIAL_TESTS],
-  adresse_p: [...POINT_SPATIAL_TESTS],
-  hoehe_r: [...RASTER_SPATIAL_TESTS],
-  th_verwaltungseinheit_f: [...DEFAULT_SPATIAL_TESTS],
-};
-
-// Labels for topics shown in the UI
-export const TOPIC_LABELS: Record<string, string> = {
-  land_f: 'Land',
-  kreis_f: 'Kreis',
-  gemeinde_f: 'Gemeinde',
-  gemarkung_f: 'Gemarkung',
-  flurstueck_f: 'Flurstück',
-  schutzgebiet_f: 'Schutzgebiet',
-  wasserschutzgebiet_f: 'Wasserschutzgebiet',
-  natura2000_f: 'Natura 2000 (Fläche)',
-  natura2000_p: 'Natura 2000 (Punkt)',
-  hohlraumbergaufsicht_f: 'Hohlraum Bergaufsicht',
-  hohlraumunterirdisch_f: 'Hohlraum Unterirdisch',
-  aspsperrzone_f: 'Afrikanische Schweinepest Sperrzone',
-  adresse_p: 'Adresse (Punkt)',
-  hoehe_r: 'Höhe',
-  th_verwaltungseinheit_f: 'Thüringer Verwaltungseinheit',
-};
+// Topic-to-interface mapping and optional UI labels
+export const TOPICS: Record<string, { interfaces: string[]; label?: string }> =
+  {
+    land_f: { interfaces: [...DEFAULT_SPATIAL_TESTS], label: 'Land' },
+    kreis_f: { interfaces: [...DEFAULT_SPATIAL_TESTS], label: 'Kreis' },
+    gemeinde_f: { interfaces: [...DEFAULT_SPATIAL_TESTS], label: 'Gemeinde' },
+    gemarkung_f: { interfaces: [...DEFAULT_SPATIAL_TESTS], label: 'Gemarkung' },
+    flurstueck_f: {
+      interfaces: [...DEFAULT_SPATIAL_TESTS],
+      label: 'Flurstück',
+    },
+    schutzgebiet_f: {
+      interfaces: [...DEFAULT_SPATIAL_TESTS],
+      label: 'Schutzgebiet',
+    },
+    wasserschutzgebiet_f: {
+      interfaces: [...DEFAULT_SPATIAL_TESTS],
+      label: 'Wasserschutzgebiet',
+    },
+    natura2000_f: {
+      interfaces: [...DEFAULT_SPATIAL_TESTS],
+      label: 'Natura 2000 (Fläche)',
+    },
+    natura2000_p: {
+      interfaces: [...POINT_SPATIAL_TESTS],
+      label: 'Natura 2000 (Punkt)',
+    },
+    hohlraumbergaufsicht_f: {
+      interfaces: [...DEFAULT_SPATIAL_TESTS],
+      label: 'Hohlraum Bergaufsicht',
+    },
+    hohlraumunterirdisch_f: {
+      interfaces: [...DEFAULT_SPATIAL_TESTS],
+      label: 'Hohlraum Unterirdisch',
+    },
+    aspsperrzone_f: {
+      interfaces: [...DEFAULT_SPATIAL_TESTS],
+      label: 'Afrikanische Schweinepest Sperrzone',
+    },
+    adresse_p: {
+      interfaces: [...POINT_SPATIAL_TESTS],
+      label: 'Adresse (Punkt)',
+    },
+    hoehe_r: { interfaces: [...RASTER_SPATIAL_TESTS], label: 'Höhe' },
+    th_verwaltungseinheit_f: {
+      interfaces: [...DEFAULT_SPATIAL_TESTS],
+      label: 'Thüringer Verwaltungseinheit',
+    },
+  };
 
 // Initial map view
 export const INITIAL_POSITION: [number, number] = [51.009504, 13.806652];
