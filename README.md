@@ -25,7 +25,9 @@ It is built using React, TypeScript, Vite and React Leaflet.
 
 Before running the application, you need to create a `.env` file to configure your environment variables. You can use the provided `.env.example` file as a template.
 
-You can customize the topics, bounding box, and other settings in `src/config/config.ts`.
+You can customize the topics, bounding box and other settings in `src/config/config.ts`.
+
+Depending on the deployment environment, consider adjusting `port_in_redirect` in `default.conf`. Disable it when running behind a reverse proxy and enable it for direct access (e.g. during local development) so redirects include the port. This ensures that `/ga-client` is redirected correctly to `/ga-client/` in both cases.
 
 ## Development
 
