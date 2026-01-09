@@ -8,11 +8,16 @@
   flex: 1;
   padding: 20px;
   min-width: 200px;
+  min-height: 0;
 }
 
 .sidebar {
-  /*flex: 0 0 400px;*/
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-width: 240px;
+  max-height: 100vh;
+  overflow: auto;
 }
 
 .sidebar-content {
@@ -36,9 +41,40 @@ select {
   width: 100%;
 }
 
+/* Make the response textarea grow to fill remaining sidebar height */
+.sidebar textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  flex: 1 1 auto;
+  min-height: 120px;
+}
+
 @media (prefers-color-scheme: light) {
   .sidebar {
     color: gray;
+  }
+}
+
+/* Mobile layout: stack map and sidebar vertically */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  .map-container {
+    flex: none;
+    height: 50vh;
+    padding: 8px;
+  }
+
+  .sidebar {
+    padding: 12px;
+    min-width: 0;
+  }
+
+  .sidebar-content {
+    margin-bottom: 10px;
   }
 }
 

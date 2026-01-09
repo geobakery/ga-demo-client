@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { LatLngExpression } from 'leaflet';
 import Map from './components/Map';
+import { INITIAL_POSITION, INITIAL_ZOOM } from './config/config';
 import APICall from './components/APICall';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import './App.css';
@@ -8,8 +8,6 @@ import './App.css';
 const App: React.FC = () => {
   const [userGeometries, setUserGeometries] = useState<Feature<Geometry>[]>([]);
   const [apiGeometries, setApiGeometries] = useState<Feature<Geometry>[]>([]);
-  const initialPosition: LatLngExpression = [51.009504, 13.806652];
-  const initialZoom: number = 13;
 
   const addUserGeometries = (
     newGeometries: Feature<Geometry, GeoJsonProperties>[],
@@ -31,8 +29,8 @@ const App: React.FC = () => {
   return (
     <div className="app-container">
       <Map
-        initialPosition={initialPosition}
-        initialZoom={initialZoom}
+        initialPosition={INITIAL_POSITION}
+        initialZoom={INITIAL_ZOOM}
         userGeometries={userGeometries}
         setUserGeometries={addUserGeometries}
         apiGeometries={apiGeometries}
