@@ -32,6 +32,8 @@ It is built using React, TypeScript, Vite and React Leaflet.
 
 Before running the application, you need to create a `.env` file to configure your environment variables. You can use the provided `.env.example` file as a template.
 
+Depending on the deployment environment, adjust `port_in_redirect` in `default.conf`. Disable it when running behind a reverse proxy and enable it for direct access (e.g. during local development).
+
 ## Development
 
 Prettier, Linter and HMR are configured. Tested in VS Code.
