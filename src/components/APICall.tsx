@@ -122,7 +122,7 @@ const APICall: React.FC<APICallProps> = ({
 
     const bodyContent: Record<string, unknown> = {
       topics: selectedTopics,
-      inputGeometries: userGeometries,
+      inputGeometries: inputGeometries,
       outputFormat: 'geojson',
       returnGeometry: returnGeometryChecked,
       outSRS: 4326,
