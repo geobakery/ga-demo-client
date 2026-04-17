@@ -14,7 +14,7 @@ RUN pnpm run build
 
 FROM nginx:alpine-slim
 
-WORKDIR /usr/share/nginx/html/ga-client/
+WORKDIR /usr/share/nginx/html/ga/demo-map/
 
 COPY --from=build /app/dist ./
 COPY ./default.conf /etc/nginx/conf.d/default.conf
