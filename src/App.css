@@ -82,3 +82,81 @@ select {
 .sr-only {
   display: none;
 }
+
+/* Popup with feature attributes */
+.popup-properties {
+  font-size: 0.85em;
+  line-height: 1.2;
+  max-width: 340px;
+  overflow-wrap: anywhere;
+  color: #1f2937;
+}
+
+.popup-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.popup-table th,
+.popup-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px 5px 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.popup-properties > .popup-table > tbody > tr > td {
+  width: 100%;
+}
+
+.popup-table tr:last-child > th,
+.popup-table tr:last-child > td {
+  border-bottom: none;
+}
+
+.popup-table th {
+  font-weight: 600;
+  white-space: nowrap;
+  color: #475569;
+  letter-spacing: 0.01em;
+}
+
+/* Visually distinguish nested tables */
+.popup-table .popup-table {
+  margin: 0;
+  background: rgba(15, 23, 42, 0.04);
+  border-radius: 4px;
+}
+
+.popup-table .popup-table th,
+.popup-table .popup-table td {
+  padding: 3px 8px;
+  font-size: 0.95em;
+  border-bottom-color: rgba(15, 23, 42, 0.05);
+}
+
+.popup-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.popup-list > li + li {
+  margin-top: 4px;
+}
+
+.popup-empty {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.popup-properties a {
+  color: #2563eb;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-all;
+}
+
+.popup-properties a:hover {
+  color: #1d4ed8;
+}
