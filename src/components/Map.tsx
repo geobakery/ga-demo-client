@@ -1,13 +1,20 @@
-import React, { useRef, useEffect } from 'react';
-import { MapContainer, TileLayer, FeatureGroup, Polygon } from 'react-leaflet';
+import React, { useRef } from 'react';
+import {
+  MapContainer,
+  TileLayer,
+  FeatureGroup,
+  Polygon,
+  GeoJSON,
+} from 'react-leaflet';
 import L, { DrawEvents, LatLngExpression } from 'leaflet';
 import { EditControl } from 'react-leaflet-draw';
-import { Feature, Geometry } from 'geojson';
+import { Feature, FeatureCollection, Geometry } from 'geojson';
 import {
   BOUNDING_BOX,
   TILE_LAYER_URL,
   TILE_LAYER_ATTRIBUTION,
 } from '../config/config';
+import { propertiesToElement } from '../utils/popup';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
@@ -76,21 +83,6 @@ const Map: React.FC<MapProps> = ({
     clearGeometries();
   };
 
-  useEffect(() => {
-    if (featureGroupRef.current) {
-      //featureGroupRef.current.clearLayers();
-      //[...userGeometries, ...apiGeometries].forEach((geometry) => {
-      [...apiGeometries].forEach((geometry) => {
-        const layer = L.geoJSON(geometry, {
-          style: { color: 'coral' },
-        });
-        layer.addTo(featureGroupRef.current!);
-        console.log('Returned geometry added to map:', geometry);
-      });
-    }
-    //  }, [userGeometries, apiGeometries]);
-  }, [apiGeometries]);
-
   const convertToLatLng = (positions: number[][]): LatLngExpression[] => {
     return positions.map((position) => {
       return [position[0], position[1]] as LatLngExpression;
@@ -98,6 +90,18 @@ const Map: React.FC<MapProps> = ({
   };
 
   const polygonPositions: LatLngExpression[] = convertToLatLng(BOUNDING_BOX);
+
+  const apiFeatureCollection: FeatureCollection = {
+    type: 'FeatureCollection',
+    features: apiGeometries,
+  };
+
+  const onEachApiFeature = (feature: Feature, layer: L.Layer) => {
+    layer.bindPopup(propertiesToElement(feature.properties), {
+      maxWidth: 360,
+      maxHeight: 360,
+    });
+  };
 
   return (
     <div className="map-container">
@@ -112,6 +116,12 @@ const Map: React.FC<MapProps> = ({
           positions={polygonPositions}
           color="gray"
           fillColor="transparent"
+        />
+        <GeoJSON
+          key={apiGeometries.length}
+          data={apiFeatureCollection}
+          style={{ color: 'coral' }}
+          onEachFeature={onEachApiFeature}
         />
         <FeatureGroup ref={featureGroupRef}>
           <EditControl
