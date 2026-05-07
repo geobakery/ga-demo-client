@@ -15,6 +15,7 @@ import {
   TILE_LAYER_ATTRIBUTION,
 } from '../config/config';
 import { propertiesToElement } from '../utils/popup';
+import BboxLabels from './BboxLabels';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
@@ -69,7 +70,6 @@ const Map: React.FC<MapProps> = ({
   const onCreated = (e: CreatedEvent) => {
     const { layer } = e;
 
-    // Check that the layer is a FeatureLayer that has the toGeoJSON method
     if ('toGeoJSON' in layer && typeof layer.toGeoJSON === 'function') {
       const geoJson = (layer as L.FeatureGroup).toGeoJSON();
       console.log('Created geometry:', geoJson);
@@ -112,11 +112,8 @@ const Map: React.FC<MapProps> = ({
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer attribution={TILE_LAYER_ATTRIBUTION} url={TILE_LAYER_URL} />
-        <Polygon
-          positions={polygonPositions}
-          color="gray"
-          fillColor="transparent"
-        />
+        <Polygon positions={polygonPositions} color="gray" fill={false} />
+        <BboxLabels />
         <GeoJSON
           key={apiGeometries.length}
           data={apiFeatureCollection}
