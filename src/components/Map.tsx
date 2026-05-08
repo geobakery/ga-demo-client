@@ -17,6 +17,7 @@ import {
 } from '../config/config';
 import { propertiesToElement } from '../utils/popup';
 import BboxLabels from './BboxLabels';
+import ClearResponsesControl from './ClearResponsesControl';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
@@ -39,6 +40,7 @@ interface MapProps {
   userGeometries: Feature<Geometry>[];
   apiGeometries: Feature<Geometry>[];
   clearGeometries: () => void;
+  clearApiGeometries: () => void;
 }
 
 const Map: React.FC<MapProps> = ({
@@ -48,6 +50,7 @@ const Map: React.FC<MapProps> = ({
   userGeometries,
   apiGeometries,
   clearGeometries,
+  clearApiGeometries,
 }) => {
   const featureGroupRef = useRef<L.FeatureGroup>(null);
 
@@ -123,6 +126,9 @@ const Map: React.FC<MapProps> = ({
           style={{ color: 'coral' }}
           onEachFeature={onEachApiFeature}
         />
+        {apiGeometries.length > 0 && (
+          <ClearResponsesControl onClear={clearApiGeometries} />
+        )}
         <FeatureGroup ref={featureGroupRef}>
           <EditControl
             position="topright"
