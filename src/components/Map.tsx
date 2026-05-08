@@ -11,6 +11,7 @@ import { EditControl } from 'react-leaflet-draw';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import {
   BOUNDING_BOX,
+  SHOW_BBOX,
   TILE_LAYER_URL,
   TILE_LAYER_ATTRIBUTION,
 } from '../config/config';
@@ -112,8 +113,10 @@ const Map: React.FC<MapProps> = ({
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer attribution={TILE_LAYER_ATTRIBUTION} url={TILE_LAYER_URL} />
-        <Polygon positions={polygonPositions} color="gray" fill={false} />
-        <BboxLabels />
+        {SHOW_BBOX && (
+          <Polygon positions={polygonPositions} color="gray" fill={false} />
+        )}
+        {SHOW_BBOX && <BboxLabels />}
         <GeoJSON
           key={apiGeometries.length}
           data={apiFeatureCollection}

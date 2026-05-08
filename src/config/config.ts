@@ -95,6 +95,9 @@ export const TOPICS: Record<string, { interfaces: string[]; label?: string }> =
 export const INITIAL_POSITION: [number, number] = [51.009504, 13.806652];
 export const INITIAL_ZOOM = 13;
 
+// Show the bbox overlay (only useful when running GeospatialAnalyzer with the demo data)
+export const SHOW_BBOX: boolean = import.meta.env.VITE_SHOW_BBOX === 'true';
+
 // Bounding box polygon shown in the map
 export const BOUNDING_BOX: number[][] = [
   [50.952162, 13.666581],
