@@ -7,10 +7,11 @@ RUN corepack enable && pnpm install --frozen-lockfile
 
 COPY . .
 
-# Build argument for API URL with default value
+# Build args (override at build time, e.g. --build-arg VITE_SHOW_BBOX=true)
 ARG VITE_API_URL="http://localhost:3000/v1"
+ARG VITE_SHOW_BBOX=false
 
-RUN pnpm run build
+RUN VITE_API_URL=$VITE_API_URL VITE_SHOW_BBOX=$VITE_SHOW_BBOX pnpm run build
 
 FROM nginx:alpine-slim
 
