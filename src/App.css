@@ -83,6 +83,41 @@ select {
   display: none;
 }
 
+/* Custom "Clear Responses" toolbar button (mirrors leaflet-draw button style) */
+.clear-responses-control {
+  position: relative;
+}
+
+.clear-responses-control a,
+.clear-responses-control a:link,
+.clear-responses-control a:visited,
+.clear-responses-control a:hover,
+.clear-responses-control a:active,
+.clear-responses-control a:focus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  line-height: 1;
+  color: #464646;
+  text-decoration: none;
+}
+
+.clear-responses-control a::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: coral;
+  box-shadow: 0 0 0 1px #fff;
+  pointer-events: none;
+}
+
 /* Popup with feature attributes */
 .popup-properties {
   font-size: 0.85em;

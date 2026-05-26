@@ -26,6 +26,10 @@ const App: React.FC = () => {
     setApiGeometries([]);
   };
 
+  const clearApiGeometries = () => {
+    setApiGeometries([]);
+  };
+
   return (
     <div className="app-container">
       <Map
@@ -35,6 +39,7 @@ const App: React.FC = () => {
         setUserGeometries={addUserGeometries}
         apiGeometries={apiGeometries}
         clearGeometries={clearGeometries}
+        clearApiGeometries={clearApiGeometries}
       />
       <APICall
         userGeometries={userGeometries}
