@@ -1,23 +1,40 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    "docker:pinDigests"
-  ],
+  "extends": ["config:recommended", "docker:pinDigests"],
   "packageRules": [
     {
       "description": "React ecosystem",
-      "matchPackageNames": ["react", "react-dom", "@types/react", "@types/react-dom", "@vitejs/plugin-react"],
+      "matchPackageNames": [
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom",
+        "@vitejs/plugin-react"
+      ],
       "groupName": "react"
     },
     {
       "description": "Leaflet ecosystem",
-      "matchPackageNames": ["leaflet", "leaflet-draw", "react-leaflet", "react-leaflet-draw", "@types/leaflet", "@types/leaflet-draw"],
+      "matchPackageNames": [
+        "leaflet",
+        "leaflet-draw",
+        "react-leaflet",
+        "react-leaflet-draw",
+        "@types/leaflet",
+        "@types/leaflet-draw"
+      ],
       "groupName": "leaflet"
     },
     {
       "description": "ESLint and TypeScript tooling",
-      "matchPackageNames": ["eslint", "@eslint/js", "typescript", "typescript-eslint", "@typescript-eslint/**", "eslint-plugin-*"],
+      "matchPackageNames": [
+        "eslint",
+        "@eslint/js",
+        "typescript",
+        "typescript-eslint",
+        "@typescript-eslint/**",
+        "eslint-plugin-*"
+      ],
       "groupName": "linting-and-typescript"
     },
     {

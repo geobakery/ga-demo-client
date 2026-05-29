@@ -3,7 +3,7 @@ name: Build and Push Docker image for deployment with geospatialanalyzer
 on:
   push:
     branches:
-      - "main"
+      - 'main'
   workflow_dispatch:
 
 permissions:
@@ -45,14 +45,14 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: "VITE_API_URL=/ga/v1" # assumes geospatialanalyzer is deployed to the same host with the url prefix /ga
+          build-args: 'VITE_API_URL=/ga/v1' # assumes geospatialanalyzer is deployed to the same host with the url prefix /ga
 
       - name: Generate SBOM
         uses: anchore/sbom-action@v0
         with:
           image: ${{ steps.meta.outputs.tags }}
-          format: "cyclonedx-json"
-          output-file: "sbom.cyclonedx.json"
+          format: 'cyclonedx-json'
+          output-file: 'sbom.cyclonedx.json'
 
       # Deactivated because it is currently not supported by the gh licensing for this repository
       # - name: Attest
