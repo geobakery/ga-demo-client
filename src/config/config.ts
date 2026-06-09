@@ -1,3 +1,12 @@
+import { normalizeApiUrl } from '../utils/apiUrl';
+
+// Default API base URL (build-time value from the environment). The base must
+// include the version segment (e.g. ".../ga/v2") so that the appended endpoint
+// paths resolve correctly.
+export const DEFAULT_API_URL: string = normalizeApiUrl(
+  import.meta.env.VITE_API_URL,
+);
+
 // Supported interfaces
 export const INTERFACES = [
   'within',
@@ -5,15 +14,6 @@ export const INTERFACES = [
   'nearestNeighbour',
   'valuesAtPoint',
 ] as const;
-
-// Spatial tests used by topics
-export const DEFAULT_SPATIAL_TESTS = [
-  'within',
-  'intersect',
-  'nearestNeighbour',
-] as const;
-export const POINT_SPATIAL_TESTS = ['intersect', 'nearestNeighbour'] as const;
-export const RASTER_SPATIAL_TESTS = ['valuesAtPoint'] as const;
 
 // Interface shown on application start
 export const DEFAULT_INTERFACE = 'within';
@@ -40,56 +40,6 @@ export const INTERFACE_DEFAULT_PARAMETERS: Record<
   },
   valuesAtPoint: {},
 };
-
-// Topic-to-interface mapping and optional UI labels
-export const TOPICS: Record<string, { interfaces: string[]; label?: string }> =
-  {
-    land_f: { interfaces: [...DEFAULT_SPATIAL_TESTS], label: 'Land' },
-    kreis_f: { interfaces: [...DEFAULT_SPATIAL_TESTS], label: 'Kreis' },
-    gemeinde_f: { interfaces: [...DEFAULT_SPATIAL_TESTS], label: 'Gemeinde' },
-    gemarkung_f: { interfaces: [...DEFAULT_SPATIAL_TESTS], label: 'Gemarkung' },
-    flurstueck_f: {
-      interfaces: [...DEFAULT_SPATIAL_TESTS],
-      label: 'Flurstück',
-    },
-    schutzgebiet_f: {
-      interfaces: [...DEFAULT_SPATIAL_TESTS],
-      label: 'Schutzgebiet',
-    },
-    wasserschutzgebiet_f: {
-      interfaces: [...DEFAULT_SPATIAL_TESTS],
-      label: 'Wasserschutzgebiet',
-    },
-    natura2000_f: {
-      interfaces: [...DEFAULT_SPATIAL_TESTS],
-      label: 'Natura 2000 (Fläche)',
-    },
-    natura2000_p: {
-      interfaces: [...POINT_SPATIAL_TESTS],
-      label: 'Natura 2000 (Punkt)',
-    },
-    hohlraumbergaufsicht_f: {
-      interfaces: [...DEFAULT_SPATIAL_TESTS],
-      label: 'Hohlraum Bergaufsicht',
-    },
-    hohlraumunterirdisch_f: {
-      interfaces: [...DEFAULT_SPATIAL_TESTS],
-      label: 'Hohlraum Unterirdisch',
-    },
-    aspsperrzone_f: {
-      interfaces: [...DEFAULT_SPATIAL_TESTS],
-      label: 'Afrikanische Schweinepest Sperrzone',
-    },
-    adresse_p: {
-      interfaces: [...POINT_SPATIAL_TESTS],
-      label: 'Adresse (Punkt)',
-    },
-    hoehe_r: { interfaces: [...RASTER_SPATIAL_TESTS], label: 'Höhe' },
-    th_verwaltungseinheit_f: {
-      interfaces: [...DEFAULT_SPATIAL_TESTS],
-      label: 'Thüringer Verwaltungseinheit',
-    },
-  };
 
 // Initial map view
 export const INITIAL_POSITION: [number, number] = [51.009504, 13.806652];

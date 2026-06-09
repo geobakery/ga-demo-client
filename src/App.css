@@ -15,7 +15,10 @@
   padding: 20px;
   display: flex;
   flex-direction: column;
-  min-width: 240px;
+  /* Fixed width so the sidebar doesn't resize as its content changes. */
+  flex: 0 0 440px;
+  width: 440px;
+  box-sizing: border-box;
   max-height: 100vh;
   overflow: auto;
 }
@@ -26,6 +29,62 @@
 
 select {
   width: 100%;
+}
+
+/* Topic multi-select: compact by default and resizable with the mouse. */
+.topic-select {
+  min-height: 5em;
+  resize: vertical;
+  overflow-y: auto;
+}
+
+.topic-select option {
+  padding: 3px 6px;
+}
+
+.api-url-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+input[name='apiUrl'] {
+  flex: 1 1 auto;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid #b0b0b0;
+  border-radius: 3px;
+  transition: border-color 0.2s ease;
+}
+
+input.api-url-input--pending {
+  border-color: #e0a800;
+}
+
+input.api-url-input--success {
+  border-color: #2e7d32;
+}
+
+input.api-url-input--error {
+  border-color: #c0392b;
+}
+
+.btn--apply-api-url {
+  flex: 0 0 auto;
+  width: 2em;
+  padding: 0;
+  cursor: pointer;
+  font-size: 1.1em;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.api-url-error {
+  color: #c0392b;
+  font-size: 0.85em;
+  margin: 6px 0 0;
 }
 
 #count,
@@ -70,7 +129,8 @@ select {
 
   .sidebar {
     padding: 12px;
-    min-width: 0;
+    flex: none;
+    width: auto;
   }
 
   .sidebar-content {

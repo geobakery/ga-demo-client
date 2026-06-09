@@ -5,9 +5,10 @@ import {
   INTERFACE_PARAMETER_MAPPING,
   INTERFACE_DEFAULT_PARAMETERS,
   DEFAULT_INTERFACE,
-  TOPICS,
+  DEFAULT_API_URL,
 } from '../config/config';
-const apiUrl = import.meta.env.VITE_API_URL;
+import { Topic, TopicDefinitionOutside, toTopic } from '../utils/topics';
+import { normalizeApiUrl } from '../utils/apiUrl';
 
 interface APICallProps {
   userGeometries: Feature<Geometry>[];
@@ -19,6 +20,13 @@ const APICall: React.FC<APICallProps> = ({
   addApiGeometries,
 }) => {
   const [result, setResult] = useState('');
+  const [apiUrl, setApiUrl] = useState<string>(DEFAULT_API_URL);
+  const [apiUrlDraft, setApiUrlDraft] = useState<string>(DEFAULT_API_URL);
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [topicsError, setTopicsError] = useState<string | null>(null);
+  const [topicsStatus, setTopicsStatus] = useState<
+    'idle' | 'success' | 'error'
+  >('idle');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedInterface, setSelectedInterface] =
     useState<string>(DEFAULT_INTERFACE);
@@ -38,6 +46,46 @@ const APICall: React.FC<APICallProps> = ({
   useEffect(() => {
     setActiveParameters(INTERFACE_PARAMETER_MAPPING[selectedInterface] ?? []);
   }, [selectedInterface]);
+
+  // Load the available topics whenever the applied API URL changes. An
+  // AbortController makes sure a slower in-flight request can't overwrite the
+  // result of a newer one (last requested wins, not last resolved).
+  useEffect(() => {
+    const controller = new AbortController();
+
+    // apiUrl is only ever a fetch() target (never script/innerHTML), so a
+    // non-http scheme can't execute and no scheme check is needed.
+    fetch(`${apiUrl}/topics`, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then((data: TopicDefinitionOutside[]) => {
+        setTopics(data.map(toTopic));
+        setTopicsError(null);
+        setTopicsStatus('success');
+      })
+      .catch((error) => {
+        if (error.name === 'AbortError') return; // superseded by a newer request
+        console.error('Failed to load topics', error);
+        setTopics([]);
+        setTopicsError(
+          `Failed to load topics: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        setTopicsStatus('error');
+      });
+
+    return () => controller.abort();
+  }, [apiUrl]);
+
+  // Apply the edited API URL: reset the topic selection and let the effect
+  // above reload the available topics from the new URL.
+  const applyApiUrl = () => {
+    setSelectedTopics([]);
+    setApiUrl(normalizeApiUrl(apiUrlDraft));
+  };
 
   // Change parameter state automaticly
   const handleParameterChange = (key: string, value: string | number) => {
@@ -70,9 +118,9 @@ const APICall: React.FC<APICallProps> = ({
     }
 
     // Filter topics
-    const filteredTopics = Object.keys(TOPICS).filter((topic) =>
-      TOPICS[topic].interfaces.includes(selectedValue),
-    );
+    const filteredTopics = topics
+      .filter((topic) => topic.interfaces.includes(selectedValue))
+      .map((topic) => topic.identifier);
     setSelectedTopics(
       selectedTopics.filter((topic) => filteredTopics.includes(topic)),
     );
@@ -156,13 +204,70 @@ const APICall: React.FC<APICallProps> = ({
   };
 
   // Get the list of topics that are valid for the selected interface
-  const availableTopics = Object.keys(TOPICS).filter((topic) =>
-    TOPICS[topic].interfaces.includes(selectedInterface),
+  const availableTopics = topics.filter((topic) =>
+    topic.interfaces.includes(selectedInterface),
   );
+
+  // While the typed URL differs from the applied one, show a "pending" state
+  const apiUrlStatus =
+    normalizeApiUrl(apiUrlDraft) !== apiUrl ? 'pending' : topicsStatus;
+  const apiUrlPending = apiUrlStatus === 'pending';
 
   return (
     <div className="sidebar">
       <h2>GeospatialAnalyzer API Call</h2>
+      <div className="sidebar-content">
+        <fieldset>
+          <legend>API URL</legend>
+          <div className="api-url-row">
+            <input
+              type="text"
+              name="apiUrl"
+              className={`api-url-input api-url-input--${apiUrlStatus}`}
+              value={apiUrlDraft}
+              onChange={(e) => setApiUrlDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') applyApiUrl();
+              }}
+            />
+            <button
+              type="button"
+              className="btn--apply-api-url"
+              onClick={applyApiUrl}
+              title={
+                apiUrlPending ? 'Apply URL and load topics' : 'Reload topics'
+              }
+              aria-label={
+                apiUrlPending ? 'Apply URL and load topics' : 'Reload topics'
+              }
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                {apiUrlPending ? (
+                  // Checkmark: confirm the typed URL and fetch topics from it
+                  <polyline points="20 6 9 17 4 12" />
+                ) : (
+                  // Reload: re-fetch topics from the unchanged URL
+                  <>
+                    <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                    <polyline points="21 3 21 8 16 8" />
+                  </>
+                )}
+              </svg>
+            </button>
+          </div>
+          {topicsError && <p className="api-url-error">{topicsError}</p>}
+        </fieldset>
+      </div>
       <div className="sidebar-content">
         <fieldset>
           <legend>Choose Interface</legend>
@@ -187,14 +292,16 @@ const APICall: React.FC<APICallProps> = ({
           <legend>Choose Topic(s)</legend>
           <label>
             <select
+              className="topic-select"
               name="selectedTopics"
               multiple={true}
+              size={Math.min(Math.max(availableTopics.length, 4), 7)}
               value={selectedTopics}
               onChange={handleTopicChange}
             >
               {availableTopics.map((topic) => (
-                <option key={topic} value={topic}>
-                  {TOPICS[topic].label ?? topic}
+                <option key={topic.identifier} value={topic.identifier}>
+                  {topic.identifier}
                 </option>
               ))}
             </select>
