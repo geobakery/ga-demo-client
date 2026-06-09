@@ -8,7 +8,7 @@ import {
   DEFAULT_API_URL,
 } from '../config/config';
 import { Topic, TopicDefinitionOutside, toTopic } from '../utils/topics';
-import { normalizeApiUrl } from '../utils/apiUrl';
+import { normalizeApiUrl, resolveApiUrl } from '../utils/apiUrl';
 
 interface APICallProps {
   userGeometries: Feature<Geometry>[];
@@ -20,8 +20,10 @@ const APICall: React.FC<APICallProps> = ({
   addApiGeometries,
 }) => {
   const [result, setResult] = useState('');
-  const [apiUrl, setApiUrl] = useState<string>(DEFAULT_API_URL);
-  const [apiUrlDraft, setApiUrlDraft] = useState<string>(DEFAULT_API_URL);
+  const [apiUrl, setApiUrl] = useState<string>(resolveApiUrl(DEFAULT_API_URL));
+  const [apiUrlDraft, setApiUrlDraft] = useState<string>(
+    resolveApiUrl(DEFAULT_API_URL),
+  );
   const [topics, setTopics] = useState<Topic[]>([]);
   const [topicsError, setTopicsError] = useState<string | null>(null);
   const [topicsStatus, setTopicsStatus] = useState<
