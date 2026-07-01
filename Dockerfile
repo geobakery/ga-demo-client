@@ -1,15 +1,7 @@
 FROM node:24-alpine AS build
 
-ARG HTTP_PROXY
-ARG HTTPS_PROXY
-ARG NO_PROXY
-ENV http_proxy=$HTTP_PROXY \
-    https_proxy=$HTTPS_PROXY \
-    no_proxy=$NO_PROXY \
-    HTTP_PROXY=$HTTP_PROXY \
-    HTTPS_PROXY=$HTTPS_PROXY \
-    NO_PROXY=$NO_PROXY \
-    NODE_USE_ENV_PROXY=1
+# Let Node/corepack honor the proxy env the build tool forwards (e.g. podman)
+ENV NODE_USE_ENV_PROXY=1
 
 WORKDIR /app
 
