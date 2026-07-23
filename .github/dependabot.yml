@@ -1,0 +1,102 @@
+version: 2
+updates:
+  # npm (pnpm workspace)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "01:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    # Group minor/patch updates; majors stay as individual PRs.
+    groups:
+      # React runtime and its types/plugin as one PR, so they never drift apart
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+          - "@vitejs/plugin-react"
+        update-types:
+          - "minor"
+          - "patch"
+      # Leaflet stack (runtime + bindings + types) as one PR
+      leaflet:
+        patterns:
+          - "leaflet"
+          - "leaflet-draw"
+          - "react-leaflet"
+          - "react-leaflet-draw"
+          - "@types/leaflet"
+          - "@types/leaflet-draw"
+        update-types:
+          - "minor"
+          - "patch"
+      # Dev toolchain as one PR
+      dev-dependencies:
+        dependency-type: "development"
+        exclude-patterns:
+          - "@types/react"
+          - "@types/react-dom"
+          - "@vitejs/plugin-react"
+          - "@types/leaflet"
+          - "@types/leaflet-draw"
+        update-types:
+          - "minor"
+          - "patch"
+      # Remaining runtime deps as one PR
+      production-dependencies:
+        dependency-type: "production"
+        exclude-patterns:
+          - "react"
+          - "react-dom"
+          - "leaflet"
+          - "leaflet-draw"
+          - "react-leaflet"
+          - "react-leaflet-draw"
+          - "@types/leaflet-draw"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      # Pin @types/node to the runtime's Node major. A major bump would ship
+      # types for APIs that don't exist at runtime. Raise it together with
+      # engines + the Dockerfile base image.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+
+  # Container base images (Dockerfile)
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "01:00"
+      timezone: "Europe/Berlin"
+    # Group minor/patch updates; majors stay as individual PRs.
+    groups:
+      container-base-images:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "01:00"
+      timezone: "Europe/Berlin"
+    # Group minor/patch updates; majors stay as individual PRs.
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
