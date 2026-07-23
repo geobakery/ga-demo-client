@@ -1,4 +1,4 @@
-FROM node:24-alpine AS build
+FROM node:26-alpine AS build
 
 # Let Node/corepack honor the proxy env the build tool forwards (e.g. podman)
 ENV NODE_USE_ENV_PROXY=1
