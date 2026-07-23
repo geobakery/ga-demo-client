@@ -83,6 +83,11 @@ updates:
         update-types:
           - 'minor'
           - 'patch'
+    ignore:
+      # Stay on the Node LTS line. Majors are raised manually together with
+      # engines + @types/node; minor/patch of the base image still flow.
+      - dependency-name: 'node'
+        update-types: ['version-update:semver-major']
 
   # GitHub Actions
   - package-ecosystem: 'github-actions'
