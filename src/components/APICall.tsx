@@ -128,12 +128,11 @@ const APICall: React.FC<APICallProps> = ({
     );
   };
 
-  const handleTopicChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedOptions = Array.from(
-      event.target.selectedOptions,
-      (option) => option.value,
+  const handleTopicChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = event.target;
+    setSelectedTopics((prev) =>
+      checked ? [...prev, value] : prev.filter((topic) => topic !== value),
     );
-    setSelectedTopics(selectedOptions);
   };
 
   const toggleGeometryCheckbox = () => {
@@ -146,6 +145,29 @@ const APICall: React.FC<APICallProps> = ({
     }));
   };
 
+  // Build the request (URL + body) from the current selections. Shared by the
+  // live query preview and the actual send so both always match.
+  const buildRequest = () => {
+    // valuesAtPoint only accepts point geometries; drop everything else.
+    const inputGeometries =
+      selectedInterface === 'valuesAtPoint'
+        ? userGeometries.filter(
+            (geometry) => geometry.geometry.type === 'Point',
+          )
+        : userGeometries;
+
+    const body: Record<string, unknown> = {
+      topics: selectedTopics,
+      inputGeometries,
+      outputFormat: 'geojson',
+      returnGeometry: returnGeometryChecked,
+      outSRS: 4326,
+      ...parameterValues, // Insert dynamic parameters
+    };
+
+    return { url: `${apiUrl}/${selectedInterface}`, body };
+  };
+
   const sendGeometryToAPI = () => {
     if (userGeometries.length === 0) {
       console.error('No geometries to send');
@@ -153,47 +175,30 @@ const APICall: React.FC<APICallProps> = ({
       return;
     }
 
-    // Only allow point geometry for 'valuesAtPoint'
-    let inputGeometries = userGeometries;
+    const { url, body } = buildRequest();
 
-    if (selectedInterface === 'valuesAtPoint') {
-      inputGeometries = userGeometries.filter(
-        (geometry) => geometry.geometry.type === 'Point',
+    if (
+      selectedInterface === 'valuesAtPoint' &&
+      (body.inputGeometries as Feature<Geometry>[]).length === 0
+    ) {
+      console.error('ValuesAtPoint requires a point geometry');
+      setResult(
+        'ValuesAtPoint requires a point geometry. Please draw a marker.',
       );
-
-      if (inputGeometries.length === 0) {
-        console.error('ValuesAtPoint requires a point geometry');
-        setResult(
-          'ValuesAtPoint requires a point geometry. Please draw a marker.',
-        );
-        return;
-      }
+      return;
     }
-
-    const bodyContent: Record<string, unknown> = {
-      topics: selectedTopics,
-      inputGeometries: inputGeometries,
-      outputFormat: 'geojson',
-      returnGeometry: returnGeometryChecked,
-      outSRS: 4326,
-      ...parameterValues, // Insert dynamic parameters
-    };
-
-    const url = `${apiUrl}/${selectedInterface}`;
 
     fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(bodyContent),
+      body: JSON.stringify(body),
     })
       .then((response) => response.json())
       .then((data: Feature<Geometry, GeoJsonProperties>[]) => {
         // Process the response
-        console.log(
-          `Sending request using interface ${JSON.stringify(selectedInterface)} and body ${JSON.stringify(bodyContent)}`,
-        );
+        console.log(`Sending request to ${url} with body`, body);
         setResult(JSON.stringify(data, undefined, 4));
 
         if (returnGeometryChecked) {
@@ -215,9 +220,16 @@ const APICall: React.FC<APICallProps> = ({
     normalizeApiUrl(apiUrlDraft) !== apiUrl ? 'pending' : topicsStatus;
   const apiUrlPending = apiUrlStatus === 'pending';
 
+  // Live preview of what Send would post, rebuilt from current selections.
+  const { url: previewUrl, body: previewBody } = buildRequest();
+  const requestPreview = `POST ${previewUrl}\n\n${JSON.stringify(previewBody, undefined, 2)}`;
+
   return (
     <div className="sidebar">
-      <h2>GeospatialAnalyzer API Call</h2>
+      <header className="sidebar-header">
+        <h2>GeospatialAnalyzer Playground</h2>
+        <p>Draw a geometry on the map and query the API.</p>
+      </header>
       <div className="sidebar-content">
         <fieldset>
           <legend>API URL</legend>
@@ -292,77 +304,82 @@ const APICall: React.FC<APICallProps> = ({
       <div className="sidebar-content">
         <fieldset>
           <legend>Choose Topic(s)</legend>
-          <label>
-            <select
-              className="topic-select"
-              name="selectedTopics"
-              multiple={true}
-              size={Math.min(Math.max(availableTopics.length, 4), 7)}
-              value={selectedTopics}
-              onChange={handleTopicChange}
-            >
+          {availableTopics.length === 0 ? (
+            <p className="topic-empty">No topics available.</p>
+          ) : (
+            <div className="topic-checkbox-list">
               {availableTopics.map((topic) => (
-                <option key={topic.identifier} value={topic.identifier}>
-                  {topic.identifier}
-                </option>
+                <label key={topic.identifier} className="topic-checkbox">
+                  <input
+                    type="checkbox"
+                    name="selectedTopics"
+                    value={topic.identifier}
+                    checked={selectedTopics.includes(topic.identifier)}
+                    onChange={handleTopicChange}
+                  />
+                  <span>{topic.identifier}</span>
+                </label>
               ))}
-            </select>
-          </label>
+            </div>
+          )}
         </fieldset>
       </div>
+      {activeParameters.length > 0 && (
+        <div className="sidebar-content">
+          <fieldset>
+            <legend>Set Parameters</legend>
+            {activeParameters.includes('returnGeometry') && (
+              <div className="parameter-row">
+                <input
+                  id="returnGeometry"
+                  type="checkbox"
+                  checked={returnGeometryChecked}
+                  onChange={toggleGeometryCheckbox}
+                />
+                <label htmlFor="returnGeometry">Return Geometry</label>
+              </div>
+            )}
+
+            {activeParameters.includes('count') && (
+              <div className="parameter-row">
+                <input
+                  id="count"
+                  type="number"
+                  value={parameterValues.count ?? 5}
+                  onChange={(e) =>
+                    handleParameterChange('count', Number(e.target.value))
+                  }
+                />
+                <label htmlFor="count">Count</label>
+              </div>
+            )}
+
+            {activeParameters.includes('maxDistanceToNeighbour') && (
+              <div className="parameter-row">
+                <input
+                  id="maxDistanceToNeighbour"
+                  type="number"
+                  value={parameterValues.maxDistanceToNeighbour ?? 2000}
+                  onChange={(e) =>
+                    handleParameterChange(
+                      'maxDistanceToNeighbour',
+                      Number(e.target.value),
+                    )
+                  }
+                />
+                <label htmlFor="maxDistanceToNeighbour">
+                  Max Distance to Neighbour (meters)
+                </label>
+              </div>
+            )}
+          </fieldset>
+        </div>
+      )}
       <div className="sidebar-content">
-        <fieldset>
-          <legend>Set Parameters</legend>
-          {activeParameters.includes('returnGeometry') && (
-            <div>
-              <input
-                id="returnGeometry"
-                type="checkbox"
-                checked={returnGeometryChecked}
-                onChange={toggleGeometryCheckbox}
-              />
-              <label htmlFor="returnGeometry">Return Geometry</label>
-            </div>
-          )}
-
-          {activeParameters.includes('count') && (
-            <div>
-              <input
-                id="count"
-                type="number"
-                value={parameterValues.count ?? 5}
-                onChange={(e) =>
-                  handleParameterChange('count', Number(e.target.value))
-                }
-              />
-              <label htmlFor="count" className="lbl--parameter">
-                Count
-              </label>
-            </div>
-          )}
-
-          {activeParameters.includes('maxDistanceToNeighbour') && (
-            <div>
-              <input
-                id="maxDistanceToNeighbour"
-                type="number"
-                value={parameterValues.maxDistanceToNeighbour ?? 2000}
-                onChange={(e) =>
-                  handleParameterChange(
-                    'maxDistanceToNeighbour',
-                    Number(e.target.value),
-                  )
-                }
-              />
-              <label
-                htmlFor="maxDistanceToNeighbour"
-                className="lbl--parameter"
-              >
-                Max Distance to Neighbour (meters)
-              </label>
-            </div>
-          )}
-        </fieldset>
+        <details className="query-preview">
+          <summary>Request preview</summary>
+          <pre className="query-preview__body">{requestPreview}</pre>
+        </details>
       </div>
       <div className="sidebar-content">
         <button className="btn--send-geometry" onClick={sendGeometryToAPI}>
