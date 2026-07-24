@@ -1,50 +1,138 @@
+/* Map and sidebar as two cards; the gutter lives here so both stretch to
+   equal height. */
 .app-container {
   display: flex;
+  gap: 16px;
+  padding: 16px;
   height: 100vh;
   width: 100vw;
+  box-sizing: border-box;
+  background: var(--bg);
 }
 
 .map-container {
   flex: 1;
-  padding: 20px;
   min-width: 200px;
   min-height: 0;
 }
 
+.map-container .leaflet-container {
+  border-radius: var(--radius);
+  /* Inset shadow instead of a real border: a border leaves a hairline seam
+     against the clipped tiles at the rounded corners in Firefox. */
+  box-shadow:
+    inset 0 0 0 1px var(--border),
+    var(--shadow);
+  /* Own layer so Firefox clips the transformed tile panes to the radius. */
+  transform: translateZ(0);
+}
+
 .sidebar {
-  padding: 20px;
+  padding: 20px 24px;
   display: flex;
   flex-direction: column;
   /* Fixed width so the sidebar doesn't resize as its content changes. */
   flex: 0 0 440px;
   width: 440px;
   box-sizing: border-box;
-  max-height: 100vh;
+  /* min-height:0 caps the stretched card at container height so content
+     scrolls inside. */
+  min-height: 0;
   overflow: auto;
+  background: var(--surface);
+  border-radius: var(--radius);
+  /* Same framing as the map card. */
+  box-shadow:
+    inset 0 0 0 1px var(--border),
+    var(--shadow);
+}
+
+.sidebar-header {
+  margin-bottom: 20px;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.sidebar-header p {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
 .sidebar-content {
-  margin-bottom: 14px;
+  margin-bottom: 18px;
+}
+
+/* Form sections: borderless fieldsets with small uppercase labels */
+fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+legend {
+  padding: 0;
+  margin-bottom: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 select {
   width: 100%;
+  box-sizing: border-box;
 }
 
-/* Topic multi-select: compact by default and resizable with the mouse. */
-.topic-select {
+/* Topic list: scrollable checkbox group, compact and resizable. */
+.topic-checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   min-height: 5em;
-  resize: vertical;
+  max-height: 14em;
   overflow-y: auto;
+  resize: vertical;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
 }
 
-.topic-select option {
-  padding: 3px 6px;
+.topic-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.topic-checkbox:hover {
+  background: var(--surface-muted);
+}
+
+.topic-checkbox input {
+  flex: none;
+}
+
+.topic-empty {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
 .api-url-row {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   align-items: stretch;
 }
 
@@ -52,39 +140,56 @@ input[name='apiUrl'] {
   flex: 1 1 auto;
   min-width: 0;
   box-sizing: border-box;
-  border: 1px solid #b0b0b0;
-  border-radius: 3px;
-  transition: border-color 0.2s ease;
+  font-size: 0.85rem;
 }
 
-input.api-url-input--pending {
-  border-color: #e0a800;
+/* Doubled class keeps these above the base input styles in index.css,
+   which are bundled later and would otherwise win the cascade.
+   The 'idle' status has no rule on purpose: it keeps the neutral base border. */
+input.api-url-input.api-url-input--pending {
+  border-color: var(--warning);
 }
 
-input.api-url-input--success {
-  border-color: #2e7d32;
+input.api-url-input.api-url-input--success {
+  border-color: var(--success);
 }
 
-input.api-url-input--error {
-  border-color: #c0392b;
+input.api-url-input.api-url-input--error {
+  border-color: var(--danger);
 }
 
 .btn--apply-api-url {
   flex: 0 0 auto;
-  width: 2em;
+  width: 34px;
   padding: 0;
-  cursor: pointer;
-  font-size: 1.1em;
-  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--text-muted);
+}
+
+.btn--apply-api-url:hover {
+  color: var(--text);
 }
 
 .api-url-error {
-  color: #c0392b;
-  font-size: 0.85em;
+  color: var(--danger);
+  font-size: 0.8rem;
   margin: 6px 0 0;
+}
+
+.parameter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.parameter-row + .parameter-row {
+  margin-top: 8px;
+}
+
+.parameter-row label {
+  font-size: 0.9rem;
 }
 
 #count,
@@ -92,49 +197,103 @@ input.api-url-input--error {
   width: 6em;
 }
 
-.lbl--parameter {
-  margin-left: 5px;
-}
-
 .btn--send-geometry {
   width: 100%;
+  padding: 9px 14px;
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 600;
 }
 
-/* Make the response textarea grow to fill remaining sidebar height */
+.btn--send-geometry:hover {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.btn--send-geometry:focus-visible {
+  border-color: var(--accent-hover);
+}
+
+/* Collapsible request preview: URL + body the Send button would post */
+.query-preview {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+}
+
+.query-preview > summary {
+  cursor: pointer;
+  padding: 8px 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.query-preview > summary:focus-visible {
+  outline: none;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.query-preview[open] > summary {
+  border-bottom: 1px solid var(--border);
+}
+
+.query-preview__body {
+  margin: 0;
+  padding: 10px 12px;
+  max-height: 40vh;
+  overflow: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Response output: monospace, grows to fill remaining sidebar height */
 .sidebar textarea {
   width: 100%;
   box-sizing: border-box;
   resize: vertical;
   flex: 1 1 auto;
   min-height: 120px;
-}
-
-@media (prefers-color-scheme: light) {
-  .sidebar {
-    color: gray;
-  }
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  background: var(--surface-muted);
+  color: var(--text);
 }
 
 /* Mobile layout: stack map and sidebar vertically */
 @media (max-width: 768px) {
   .app-container {
     flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    /* Stacked cards can exceed the viewport, so let the page grow and scroll. */
+    height: auto;
+    min-height: 100vh;
   }
 
   .map-container {
     flex: none;
     height: 50vh;
-    padding: 8px;
   }
 
   .sidebar {
-    padding: 12px;
+    padding: 14px 16px;
     flex: none;
     width: auto;
   }
 
   .sidebar-content {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
   }
 }
 
@@ -178,7 +337,7 @@ input.api-url-input--error {
   pointer-events: none;
 }
 
-/* Popup with feature attributes */
+/* Popup with feature attributes (Leaflet popups stay light in both schemes) */
 .popup-properties {
   font-size: 0.85em;
   line-height: 1.2;
