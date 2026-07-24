@@ -6,7 +6,7 @@ import {
   Polygon,
   GeoJSON,
 } from 'react-leaflet';
-import L, { DrawEvents, LatLngExpression } from 'leaflet';
+import L, { LatLngExpression } from 'leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import {
@@ -16,6 +16,7 @@ import {
   TILE_LAYER_ATTRIBUTION,
 } from '../config/config';
 import { propertiesToElement } from '../utils/popup';
+import { collectGeometries } from '../utils/geometries';
 import BboxLabels from './BboxLabels';
 import ClearResponsesControl from './ClearResponsesControl';
 import 'leaflet/dist/leaflet.css';
@@ -29,17 +30,11 @@ L.Icon.Default.mergeOptions({
   shadowUrl: '/ga/demo-map/images/marker-shadow.png',
 });
 
-interface CreatedEvent {
-  layer: L.Layer;
-}
-
 interface MapProps {
   initialPosition: LatLngExpression;
   initialZoom: number;
   setUserGeometries: (geometries: Feature<Geometry>[]) => void;
-  userGeometries: Feature<Geometry>[];
   apiGeometries: Feature<Geometry>[];
-  clearGeometries: () => void;
   clearApiGeometries: () => void;
 }
 
@@ -47,44 +42,19 @@ const Map: React.FC<MapProps> = ({
   initialPosition,
   initialZoom,
   setUserGeometries,
-  userGeometries,
   apiGeometries,
-  clearGeometries,
   clearApiGeometries,
 }) => {
   const featureGroupRef = useRef<L.FeatureGroup>(null);
 
-  const onEdited = (e: DrawEvents.Edited) => {
-    const layers = e.layers;
-    const newGeometries: Feature<Geometry>[] = [];
-
-    layers.eachLayer((layer: L.Layer) => {
-      if ('toGeoJSON' in layer && typeof layer.toGeoJSON === 'function') {
-        const geoJson = (layer as L.FeatureGroup).toGeoJSON();
-        newGeometries.push(geoJson as Feature<Geometry>);
-      } else {
-        console.error('Layer does not support toGeoJSON method');
-      }
-    });
-
-    console.log('Edited geometries:', newGeometries);
-    setUserGeometries(newGeometries);
-  };
-
-  const onCreated = (e: CreatedEvent) => {
-    const { layer } = e;
-
-    if ('toGeoJSON' in layer && typeof layer.toGeoJSON === 'function') {
-      const geoJson = (layer as L.FeatureGroup).toGeoJSON();
-      console.log('Created geometry:', geoJson);
-      setUserGeometries([...userGeometries, geoJson as Feature<Geometry>]);
-    } else {
-      console.error('Layer does not support toGeoJSON method');
-    }
-  };
-
-  const onDeleted = () => {
-    clearGeometries();
+  // Mirror the FeatureGroup into state after every create/edit/delete.
+  // leaflet-draw keeps the group current, so replacing the state with its
+  // contents (see collectGeometries) fixes the duplicate geometry (#16) and
+  // the lost selection when deleting one of several shapes (#17).
+  const syncDrawnGeometries = () => {
+    const group = featureGroupRef.current;
+    if (!group) return;
+    setUserGeometries(collectGeometries(group));
   };
 
   const convertToLatLng = (positions: number[][]): LatLngExpression[] => {
@@ -144,9 +114,9 @@ const Map: React.FC<MapProps> = ({
               remove: true,
               edit: false,
             }}
-            onEdited={onEdited}
-            onCreated={onCreated}
-            onDeleted={onDeleted}
+            onEdited={syncDrawnGeometries}
+            onCreated={syncDrawnGeometries}
+            onDeleted={syncDrawnGeometries}
           />
         </FeatureGroup>
       </MapContainer>

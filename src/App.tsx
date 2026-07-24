@@ -9,21 +9,10 @@ const App: React.FC = () => {
   const [userGeometries, setUserGeometries] = useState<Feature<Geometry>[]>([]);
   const [apiGeometries, setApiGeometries] = useState<Feature<Geometry>[]>([]);
 
-  const addUserGeometries = (
-    newGeometries: Feature<Geometry, GeoJsonProperties>[],
-  ) => {
-    setUserGeometries([...userGeometries, ...newGeometries]);
-  };
-
   const addApiGeometries = (
     newGeometries: Feature<Geometry, GeoJsonProperties>[],
   ) => {
     setApiGeometries([...apiGeometries, ...newGeometries]);
-  };
-
-  const clearGeometries = () => {
-    setUserGeometries([]);
-    setApiGeometries([]);
   };
 
   const clearApiGeometries = () => {
@@ -35,10 +24,8 @@ const App: React.FC = () => {
       <Map
         initialPosition={INITIAL_POSITION}
         initialZoom={INITIAL_ZOOM}
-        userGeometries={userGeometries}
-        setUserGeometries={addUserGeometries}
+        setUserGeometries={setUserGeometries}
         apiGeometries={apiGeometries}
-        clearGeometries={clearGeometries}
         clearApiGeometries={clearApiGeometries}
       />
       <APICall
