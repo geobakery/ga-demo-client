@@ -1,2 +1,5 @@
 pnpm-lock.yaml
 dist
+
+# Generated data file, kept compact on one line
+src/config/saxony-outline.json

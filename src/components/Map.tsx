@@ -12,6 +12,8 @@ import { Feature, FeatureCollection, Geometry } from 'geojson';
 import {
   BOUNDING_BOX,
   SHOW_BBOX,
+  SAXONY_OUTLINE,
+  SHOW_SAXONY_OUTLINE,
   TILE_LAYER_URL,
   TILE_LAYER_ATTRIBUTION,
 } from '../config/config';
@@ -29,6 +31,15 @@ L.Icon.Default.mergeOptions({
   iconUrl: '/ga/demo-map/images/marker-icon.png',
   shadowUrl: '/ga/demo-map/images/marker-shadow.png',
 });
+
+const SAXONY_BOUNDS = L.latLngBounds(SAXONY_OUTLINE.flat());
+
+const SAXONY_BORDER_STYLE: L.PathOptions = {
+  color: '#3f4a5a',
+  weight: 2,
+  opacity: 0.8,
+  fill: false,
+};
 
 interface MapProps {
   initialPosition: LatLngExpression;
@@ -80,12 +91,31 @@ const Map: React.FC<MapProps> = ({
   return (
     <div className="map-container">
       <MapContainer
-        center={initialPosition}
-        zoom={initialZoom}
+        // MapContainer ignores bounds once center/zoom are set, so the demo
+        // close-up and the Saxony-wide view are passed exclusively.
+        {...(SHOW_BBOX
+          ? { center: initialPosition, zoom: initialZoom }
+          : {
+              bounds: SAXONY_BOUNDS,
+              boundsOptions: { padding: [16, 16] },
+              // fitBounds rounds down to the next zoomSnap step; with the
+              // default of 1 the state floats in too much empty margin.
+              zoomSnap: 0.5,
+            })}
         scrollWheelZoom={true}
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer attribution={TILE_LAYER_ATTRIBUTION} url={TILE_LAYER_URL} />
+        {/* Non-interactive so the border never swallows a click meant for a
+            drawn or returned geometry. */}
+        {SHOW_SAXONY_OUTLINE && (
+          <Polygon
+            positions={SAXONY_OUTLINE}
+            pathOptions={SAXONY_BORDER_STYLE}
+            interactive={false}
+            attribution="&copy; GeoSN, <a href='https://www.govdata.de/dl-de/by-2-0'>dl-de/by-2-0</a>"
+          />
+        )}
         {SHOW_BBOX && (
           <Polygon positions={polygonPositions} color="gray" fill={false} />
         )}
