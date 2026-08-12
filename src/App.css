@@ -256,11 +256,11 @@ input.api-url-input.api-url-input--error {
   overflow-wrap: anywhere;
 }
 
-/* Response output: monospace, grows to fill remaining sidebar height */
+/* Response output: monospace, fills the remaining sidebar height */
 .sidebar textarea {
   width: 100%;
   box-sizing: border-box;
-  resize: vertical;
+  resize: none;
   flex: 1 1 auto;
   min-height: 120px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
