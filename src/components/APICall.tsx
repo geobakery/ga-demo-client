@@ -7,7 +7,12 @@ import {
   DEFAULT_INTERFACE,
   DEFAULT_API_URL,
 } from '../config/config';
-import { Topic, TopicDefinitionOutside, toTopic } from '../utils/topics';
+import {
+  Topic,
+  TopicDefinitionOutside,
+  toTopic,
+  topicTooltip,
+} from '../utils/topics';
 import { normalizeApiUrl, resolveApiUrl } from '../utils/apiUrl';
 
 interface APICallProps {
@@ -309,7 +314,11 @@ const APICall: React.FC<APICallProps> = ({
           ) : (
             <div className="topic-checkbox-list">
               {availableTopics.map((topic) => (
-                <label key={topic.identifier} className="topic-checkbox">
+                <label
+                  key={topic.identifier}
+                  className="topic-checkbox"
+                  title={topicTooltip(topic)}
+                >
                   <input
                     type="checkbox"
                     name="selectedTopics"

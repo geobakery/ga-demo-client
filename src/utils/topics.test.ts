@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { toTopic } from './topics';
+import { toTopic, topicTooltip } from './topics';
 
 describe('toTopic', () => {
   it('picks the shortest identifier', () => {
@@ -37,5 +37,54 @@ describe('toTopic', () => {
     const raw = { identifiers: ['sn_kreis_f', 'kreis_f'] };
     toTopic(raw);
     expect(raw.identifiers).toEqual(['sn_kreis_f', 'kreis_f']);
+  });
+
+  it('passes title and description through', () => {
+    expect(
+      toTopic({
+        identifiers: ['kreis_f'],
+        title: 'Landkreise/Kreise',
+        description: 'Landkreise und kreisfreie Städte in Sachsen.',
+      }),
+    ).toMatchObject({
+      title: 'Landkreise/Kreise',
+      description: 'Landkreise und kreisfreie Städte in Sachsen.',
+    });
+  });
+});
+
+describe('topicTooltip', () => {
+  it('joins title and description', () => {
+    expect(
+      topicTooltip({
+        identifier: 'kreis_f',
+        interfaces: [],
+        title: 'Landkreise/Kreise',
+        description: 'Landkreise und kreisfreie Städte in Sachsen.',
+      }),
+    ).toBe('Landkreise/Kreise: Landkreise und kreisfreie Städte in Sachsen.');
+  });
+
+  it('falls back to whichever part is present', () => {
+    expect(
+      topicTooltip({
+        identifier: 'kreis_f',
+        interfaces: [],
+        title: 'Landkreise/Kreise',
+      }),
+    ).toBe('Landkreise/Kreise');
+    expect(
+      topicTooltip({
+        identifier: 'kreis_f',
+        interfaces: [],
+        description: 'Landkreise in Sachsen.',
+      }),
+    ).toBe('Landkreise in Sachsen.');
+  });
+
+  it('returns undefined when neither is set', () => {
+    expect(
+      topicTooltip({ identifier: 'kreis_f', interfaces: [] }),
+    ).toBeUndefined();
   });
 });
