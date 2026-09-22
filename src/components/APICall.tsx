@@ -96,12 +96,20 @@ const APICall: React.FC<APICallProps> = ({
     setApiUrl(normalizeApiUrl(apiUrlDraft));
   };
 
-  // Change parameter state automaticly
-  const handleParameterChange = (key: string, value: string | number) => {
-    setParameterValues((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
+  // Remove empty values so the parameter is omitted from the request.
+  const handleParameterChange = (
+    key: keyof RequestParameters,
+    value: string,
+  ) => {
+    setParameterValues((prev) => {
+      const next = { ...prev };
+      if (value === '') {
+        delete next[key];
+      } else {
+        next[key] = Number(value);
+      }
+      return next;
+    });
   };
 
   const handleInterfaceChange = (
@@ -155,7 +163,23 @@ const APICall: React.FC<APICallProps> = ({
       },
       body: JSON.stringify(body),
     })
-      .then((response) => response.json())
+      .then(async (response) => {
+        if (!response.ok) {
+          // Status line, blank line, API error body (indented if JSON)
+          const text = await response.text();
+          let details = text;
+          try {
+            details = JSON.stringify(JSON.parse(text), undefined, 4);
+          } catch {
+            // not JSON, keep the raw text
+          }
+          // statusText may be empty with HTTP/2
+          const status =
+            `HTTP ${response.status} ${response.statusText}`.trimEnd();
+          throw new Error(details ? `${status}\n\n${details}` : status);
+        }
+        return response.json();
+      })
       .then((data: Feature<Geometry, GeoJsonProperties>[]) => {
         setResult(JSON.stringify(data, undefined, 4));
 
@@ -164,7 +188,10 @@ const APICall: React.FC<APICallProps> = ({
         }
       })
       .catch((error) => {
-        console.error(error);
+        console.error('Request failed', error);
+        setResult(
+          `Request failed: ${error instanceof Error ? error.message : String(error)}`,
+        );
       });
   };
 
@@ -304,9 +331,9 @@ const APICall: React.FC<APICallProps> = ({
                 <input
                   id="count"
                   type="number"
-                  value={parameterValues.count ?? 5}
+                  value={parameterValues.count ?? ''}
                   onChange={(e) =>
-                    handleParameterChange('count', Number(e.target.value))
+                    handleParameterChange('count', e.target.value)
                   }
                 />
                 <label htmlFor="count">Count</label>
@@ -318,11 +345,11 @@ const APICall: React.FC<APICallProps> = ({
                 <input
                   id="maxDistanceToNeighbour"
                   type="number"
-                  value={parameterValues.maxDistanceToNeighbour ?? 2000}
+                  value={parameterValues.maxDistanceToNeighbour ?? ''}
                   onChange={(e) =>
                     handleParameterChange(
                       'maxDistanceToNeighbour',
-                      Number(e.target.value),
+                      e.target.value,
                     )
                   }
                 />
