@@ -16,30 +16,45 @@ export const INTERFACES = [
   'valuesAtPoint',
 ] as const;
 
-// Interface shown on application start
-export const DEFAULT_INTERFACE = 'within';
+export type InterfaceName = (typeof INTERFACES)[number];
 
-// Mapping of interfaces to their parameters
-export const INTERFACE_PARAMETER_MAPPING: Record<string, string[]> = {
+// Interface shown on application start
+export const DEFAULT_INTERFACE: InterfaceName = 'within';
+
+// Interface-specific parameters sent along with the request body.
+// returnGeometry is a common body field and therefore kept separate.
+export type RequestParameters = {
+  count?: number;
+  maxDistanceToNeighbour?: number;
+};
+
+// Parameters editable in the UI.
+export type ParameterName = 'returnGeometry' | keyof RequestParameters;
+
+export const INTERFACE_PARAMETER_MAPPING: Record<
+  InterfaceName,
+  ParameterName[]
+> = {
   within: ['returnGeometry'],
   intersect: ['returnGeometry'],
   nearestNeighbour: ['returnGeometry', 'count', 'maxDistanceToNeighbour'],
   valuesAtPoint: [],
 };
 
-// Default parameters for each interface
-export const INTERFACE_DEFAULT_PARAMETERS: Record<
-  string,
-  Record<string, unknown>
-> = {
-  within: { returnGeometry: true },
-  intersect: { returnGeometry: true },
+export type InterfaceDefaults = {
+  returnGeometry: boolean;
+  parameters: RequestParameters;
+};
+
+// valuesAtPoint returns attribute values only, so returnGeometry is off.
+export const INTERFACE_DEFAULTS: Record<InterfaceName, InterfaceDefaults> = {
+  within: { returnGeometry: true, parameters: {} },
+  intersect: { returnGeometry: true, parameters: {} },
   nearestNeighbour: {
     returnGeometry: true,
-    count: 5,
-    maxDistanceToNeighbour: 2000,
+    parameters: { count: 5, maxDistanceToNeighbour: 2000 },
   },
-  valuesAtPoint: {},
+  valuesAtPoint: { returnGeometry: false, parameters: {} },
 };
 
 // Initial map view
