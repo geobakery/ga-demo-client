@@ -3,9 +3,10 @@ import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import {
   INTERFACES,
   INTERFACE_PARAMETER_MAPPING,
-  INTERFACE_DEFAULT_PARAMETERS,
   DEFAULT_INTERFACE,
   DEFAULT_API_URL,
+  type InterfaceName,
+  type RequestParameters,
 } from '../config/config';
 import {
   Topic,
@@ -14,11 +15,19 @@ import {
   topicTooltip,
 } from '../utils/topics';
 import { normalizeApiUrl, resolveApiUrl } from '../utils/apiUrl';
+import { buildRequest, validateGeometries } from '../utils/request';
+import {
+  selectInterface,
+  topicsForInterface,
+} from '../utils/interfaceSelection';
 
 interface APICallProps {
   userGeometries: Feature<Geometry>[];
   addApiGeometries: (geometries: Feature<Geometry>[]) => void;
 }
+
+// Parameter state on application start, derived like any interface switch.
+const INITIAL_SELECTION = selectInterface(DEFAULT_INTERFACE, [], []);
 
 const APICall: React.FC<APICallProps> = ({
   userGeometries,
@@ -36,23 +45,16 @@ const APICall: React.FC<APICallProps> = ({
   >('idle');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedInterface, setSelectedInterface] =
-    useState<string>(DEFAULT_INTERFACE);
-  const [returnGeometryChecked, setReturnGeometryChecked] =
-    React.useState(true);
-  const [activeParameters, setActiveParameters] = useState<string[]>([]);
+    useState<InterfaceName>(DEFAULT_INTERFACE);
+  const [returnGeometryChecked, setReturnGeometryChecked] = useState(
+    INITIAL_SELECTION.returnGeometry,
+  );
+  const [parameterValues, setParameterValues] = useState<RequestParameters>(
+    INITIAL_SELECTION.parameterValues,
+  );
 
-  interface ParameterValues {
-    count?: number;
-    maxDistanceToNeighbour?: number;
-    returnGeometry?: boolean;
-  }
-
-  const [parameterValues, setParameterValues] = useState<ParameterValues>({});
-
-  // Init parameters
-  useEffect(() => {
-    setActiveParameters(INTERFACE_PARAMETER_MAPPING[selectedInterface] ?? []);
-  }, [selectedInterface]);
+  // Parameters the user can edit for the selected interface
+  const activeParameters = INTERFACE_PARAMETER_MAPPING[selectedInterface];
 
   // Load the available topics whenever the applied API URL changes. An
   // AbortController makes sure a slower in-flight request can't overwrite the
@@ -105,32 +107,13 @@ const APICall: React.FC<APICallProps> = ({
   const handleInterfaceChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
-    const selectedValue = event.target.value;
-    setSelectedInterface(selectedValue);
-
-    const parameters = INTERFACE_PARAMETER_MAPPING[selectedValue] ?? [];
-    setActiveParameters(parameters);
-
-    // Use default parameter values from config
-    const defaults = INTERFACE_DEFAULT_PARAMETERS[selectedValue] ?? {};
-    setParameterValues(defaults);
-
-    if ('returnGeometry' in defaults) {
-      const dg = defaults as Record<string, unknown>;
-      if (dg.returnGeometry !== undefined) {
-        setReturnGeometryChecked(Boolean(dg.returnGeometry));
-      }
-    } else if (selectedValue === 'valuesAtPoint') {
-      setReturnGeometryChecked(false);
-    }
-
-    // Filter topics
-    const filteredTopics = topics
-      .filter((topic) => topic.interfaces.includes(selectedValue))
-      .map((topic) => topic.identifier);
-    setSelectedTopics(
-      selectedTopics.filter((topic) => filteredTopics.includes(topic)),
-    );
+    // The select only allows valid InterfaceName values.
+    const nextInterface = event.target.value as InterfaceName;
+    const selection = selectInterface(nextInterface, topics, selectedTopics);
+    setSelectedInterface(nextInterface);
+    setParameterValues(selection.parameterValues);
+    setReturnGeometryChecked(selection.returnGeometry);
+    setSelectedTopics(selection.selectedTopics);
   };
 
   const handleTopicChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -141,57 +124,29 @@ const APICall: React.FC<APICallProps> = ({
   };
 
   const toggleGeometryCheckbox = () => {
-    const newValue = !returnGeometryChecked;
-    setReturnGeometryChecked(newValue);
-
-    setParameterValues((prev) => ({
-      ...prev,
-      returnGeometry: newValue,
-    }));
+    setReturnGeometryChecked((prev) => !prev);
   };
 
-  // Build the request (URL + body) from the current selections. Shared by the
-  // live query preview and the actual send so both always match.
-  const buildRequest = () => {
-    // valuesAtPoint only accepts point geometries; drop everything else.
-    const inputGeometries =
-      selectedInterface === 'valuesAtPoint'
-        ? userGeometries.filter(
-            (geometry) => geometry.geometry.type === 'Point',
-          )
-        : userGeometries;
-
-    const body: Record<string, unknown> = {
+  // Shared by the request preview and the actual send so both always match.
+  const currentRequest = () =>
+    buildRequest({
+      apiUrl,
+      interfaceName: selectedInterface,
       topics: selectedTopics,
-      inputGeometries,
-      outputFormat: 'geojson',
+      geometries: userGeometries,
       returnGeometry: returnGeometryChecked,
-      outSRS: 4326,
-      ...parameterValues, // Insert dynamic parameters
-    };
-
-    return { url: `${apiUrl}/${selectedInterface}`, body };
-  };
+      parameters: parameterValues,
+    });
 
   const sendGeometryToAPI = () => {
-    if (userGeometries.length === 0) {
-      console.error('No geometries to send');
-      setResult('No geometries to send. Please draw one.');
+    const problem = validateGeometries(selectedInterface, userGeometries);
+    if (problem) {
+      console.error(problem);
+      setResult(problem);
       return;
     }
 
-    const { url, body } = buildRequest();
-
-    if (
-      selectedInterface === 'valuesAtPoint' &&
-      (body.inputGeometries as Feature<Geometry>[]).length === 0
-    ) {
-      console.error('ValuesAtPoint requires a point geometry');
-      setResult(
-        'ValuesAtPoint requires a point geometry. Please draw a marker.',
-      );
-      return;
-    }
+    const { url, body } = currentRequest();
 
     fetch(url, {
       method: 'POST',
@@ -202,8 +157,6 @@ const APICall: React.FC<APICallProps> = ({
     })
       .then((response) => response.json())
       .then((data: Feature<Geometry, GeoJsonProperties>[]) => {
-        // Process the response
-        console.log(`Sending request to ${url} with body`, body);
         setResult(JSON.stringify(data, undefined, 4));
 
         if (returnGeometryChecked) {
@@ -215,10 +168,7 @@ const APICall: React.FC<APICallProps> = ({
       });
   };
 
-  // Get the list of topics that are valid for the selected interface
-  const availableTopics = topics.filter((topic) =>
-    topic.interfaces.includes(selectedInterface),
-  );
+  const availableTopics = topicsForInterface(selectedInterface, topics);
 
   // While the typed URL differs from the applied one, show a "pending" state
   const apiUrlStatus =
@@ -226,7 +176,7 @@ const APICall: React.FC<APICallProps> = ({
   const apiUrlPending = apiUrlStatus === 'pending';
 
   // Live preview of what Send would post, rebuilt from current selections.
-  const { url: previewUrl, body: previewBody } = buildRequest();
+  const { url: previewUrl, body: previewBody } = currentRequest();
   const requestPreview = `POST ${previewUrl}\n\n${JSON.stringify(previewBody, undefined, 2)}`;
 
   return (
