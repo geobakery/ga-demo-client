@@ -37,7 +37,10 @@ describe('selectInterface', () => {
   });
 
   it('clears the parameter values for an interface without parameters', () => {
-    expect(selectInterface('within', topics, []).parameterValues).toEqual({});
+    expect(selectInterface('within', topics, []).parameterValues).toEqual({
+      buffer: 0,
+      returnBufferGeometry: false,
+    });
   });
 
   it('returns a copy of the defaults, not the config object', () => {
