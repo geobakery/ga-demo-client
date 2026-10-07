@@ -23,7 +23,9 @@ import {
 
 interface APICallProps {
   userGeometries: Feature<Geometry>[];
-  addApiGeometries: (geometries: Feature<Geometry>[]) => void;
+  addApiGeometries: (
+    geometries: Feature<Geometry, GeoJsonProperties>[],
+  ) => void;
 }
 
 // Parameter state on application start, derived like any interface switch.
@@ -112,6 +114,15 @@ const APICall: React.FC<APICallProps> = ({
     });
   };
 
+  const handleBufferGeometryChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setParameterValues((prev) => ({
+      ...prev,
+      returnBufferGeometry: event.target.checked,
+    }));
+  };
+
   const handleInterfaceChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
@@ -183,7 +194,10 @@ const APICall: React.FC<APICallProps> = ({
       .then((data: Feature<Geometry, GeoJsonProperties>[]) => {
         setResult(JSON.stringify(data, undefined, 4));
 
-        if (returnGeometryChecked) {
+        if (
+          returnGeometryChecked ||
+          parameterValues.returnBufferGeometry === true
+        ) {
           addApiGeometries(data);
         }
       })
@@ -209,10 +223,54 @@ const APICall: React.FC<APICallProps> = ({
   return (
     <div className="sidebar">
       <header className="sidebar-header">
-        <h2>GeospatialAnalyzer Playground</h2>
-        <p>Draw a geometry on the map and query the API.</p>
+        <h1>GeospatialAnalyzer</h1>
+        <p>Demo Client for the API.</p>
       </header>
+
       <div className="sidebar-content">
+        <h3>Input</h3>
+        <p>Draw a geometry on the map.</p>
+
+        {activeParameters.length > 0 && (
+          <fieldset>
+            {activeParameters.includes('buffer') &&
+              activeParameters.includes('returnBufferGeometry') && (
+                <>
+                  <legend>Buffer</legend>
+                  <div className="parameter-row">
+                    <input
+                      id="buffer"
+                      type="number"
+                      min="0"
+                      value={parameterValues.buffer ?? ''}
+                      onChange={(e) =>
+                        handleParameterChange('buffer', e.target.value)
+                      }
+                    />
+                    <label htmlFor="buffer">Buffer Distance [m]</label>
+                  </div>
+
+                  <div className="parameter-row">
+                    <input
+                      id="returnBufferGeometry"
+                      type="checkbox"
+                      checked={parameterValues.returnBufferGeometry ?? false}
+                      onChange={handleBufferGeometryChange}
+                    />
+                    <label htmlFor="returnBufferGeometry">
+                      Return Buffer Geometry
+                    </label>
+                  </div>
+                </>
+              )}
+          </fieldset>
+        )}
+      </div>
+
+      <div className="sidebar-content">
+        <h3>Database</h3>
+        <p>Connect an API and select available topics.</p>
+
         <fieldset>
           <legend>API URL</legend>
           <div className="api-url-row">
@@ -263,27 +321,7 @@ const APICall: React.FC<APICallProps> = ({
           </div>
           {topicsError && <p className="api-url-error">{topicsError}</p>}
         </fieldset>
-      </div>
-      <div className="sidebar-content">
-        <fieldset>
-          <legend>Choose Interface</legend>
-          <label>
-            <select
-              name="selectedInterface"
-              value={selectedInterface}
-              multiple={false}
-              onChange={handleInterfaceChange}
-            >
-              {INTERFACES.map((iface) => (
-                <option key={iface} value={iface}>
-                  {iface}
-                </option>
-              ))}
-            </select>
-          </label>
-        </fieldset>
-      </div>
-      <div className="sidebar-content">
+
         <fieldset>
           <legend>Choose Topic(s)</legend>
           {availableTopics.length === 0 ? (
@@ -310,8 +348,30 @@ const APICall: React.FC<APICallProps> = ({
           )}
         </fieldset>
       </div>
-      {activeParameters.length > 0 && (
-        <div className="sidebar-content">
+
+      <div className="sidebar-content">
+        <h3>Analysis</h3>
+        <p>Configure your spatial query.</p>
+
+        <fieldset>
+          <legend>Choose Tool</legend>
+          <label>
+            <select
+              name="selectedInterface"
+              value={selectedInterface}
+              multiple={false}
+              onChange={handleInterfaceChange}
+            >
+              {INTERFACES.map((iface) => (
+                <option key={iface} value={iface}>
+                  {iface}
+                </option>
+              ))}
+            </select>
+          </label>
+        </fieldset>
+
+        {activeParameters.length > 0 && (
           <fieldset>
             <legend>Set Parameters</legend>
             {activeParameters.includes('returnGeometry') && (
@@ -322,7 +382,7 @@ const APICall: React.FC<APICallProps> = ({
                   checked={returnGeometryChecked}
                   onChange={toggleGeometryCheckbox}
                 />
-                <label htmlFor="returnGeometry">Return Geometry</label>
+                <label htmlFor="returnGeometry">Return Result Geometry</label>
               </div>
             )}
 
@@ -354,25 +414,35 @@ const APICall: React.FC<APICallProps> = ({
                   }
                 />
                 <label htmlFor="maxDistanceToNeighbour">
-                  Max Distance to Neighbour (meters)
+                  Max Distance to Neighbour [m]
                 </label>
               </div>
             )}
           </fieldset>
-        </div>
-      )}
-      <div className="sidebar-content">
-        <details className="query-preview">
-          <summary>Request preview</summary>
-          <pre className="query-preview__body">{requestPreview}</pre>
-        </details>
+        )}
+
+        <fieldset>
+          <details className="query-preview">
+            <summary>Request preview</summary>
+            <pre className="query-preview__body">{requestPreview}</pre>
+          </details>
+        </fieldset>
       </div>
-      <div className="sidebar-content">
-        <button className="btn--send-geometry" onClick={sendGeometryToAPI}>
-          Send Geometry to API
-        </button>
+
+      <div className="sidebar-button">
+          <button className="btn--send-geometry" onClick={sendGeometryToAPI}>
+            Send Geometry to API
+          </button>
       </div>
-      <textarea value={result} readOnly cols={50} rows={15} />
+
+      <div className="sidebar-content">
+        <h3>Response</h3>
+        <p>View the output here.</p>
+
+        <fieldset>
+          <textarea value={result} readOnly cols={50} rows={15} />
+        </fieldset>
+      </div>
     </div>
   );
 };

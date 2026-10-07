@@ -7,12 +7,14 @@ import './App.css';
 
 const App: React.FC = () => {
   const [userGeometries, setUserGeometries] = useState<Feature<Geometry>[]>([]);
-  const [apiGeometries, setApiGeometries] = useState<Feature<Geometry>[]>([]);
+  const [apiGeometries, setApiGeometries] = useState<
+    Feature<Geometry, GeoJsonProperties>[]
+  >([]);
 
   const addApiGeometries = (
     newGeometries: Feature<Geometry, GeoJsonProperties>[],
   ) => {
-    setApiGeometries([...apiGeometries, ...newGeometries]);
+    setApiGeometries((prev) => [...prev, ...newGeometries]);
   };
 
   const clearApiGeometries = () => {

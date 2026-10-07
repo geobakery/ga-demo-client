@@ -1,187 +1,544 @@
-/* Map and sidebar as two cards; the gutter lives here so both stretch to
-   equal height. */
+:root {
+  --bg: #e9eee9;
+  --sidebar-bg: #f4f6f3;
+  --surface: #ffffff;
+  --surface-sunken: #f6f8f5;
+
+  --line: #e4e9e3;
+  --line-strong: #d2d9d1;
+
+  --ink: #1f2a27;
+  --ink-2: #44524d;
+  --ink-3: #68756f;
+  --ink-4: #94a09a;
+
+  --accent: #2d7a6e;
+  --accent-hover: #236557;
+  --accent-soft: #e4f1ed;
+  --accent-line: #b3d5ca;
+  --accent-contrast: #ffffff;
+
+  --success: #1e7b4a;
+  --success-soft: #eef7f1;
+  --success-line: #9fd0b4;
+
+  --warning: #a15c07;
+  --warning-soft: #fdf6e7;
+  --warning-line: #e4bd74;
+
+  --danger: #b42318;
+  --danger-soft: #fdf0ee;
+  --danger-line: #efa9a2;
+
+  --focus-ring: rgba(45, 122, 110, 0.28);
+
+  --radius: 18px;
+  --radius-sm: 10px;
+
+  --shadow-sm:
+    0 1px 2px rgba(31, 42, 39, 0.05),
+    0 2px 10px rgba(31, 42, 39, 0.04);
+
+  --shadow:
+    0 2px 4px rgba(31, 42, 39, 0.04),
+    0 14px 36px rgba(31, 42, 39, 0.09);
+
+  --font-sans:
+    Inter,
+    ui-sans-serif,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+
+  --font-mono:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    "Liberation Mono",
+    monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  color: var(--ink);
+  background: var(--bg);
+
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.45;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  color: var(--ink);
+  background-color: var(--surface);
+
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+input:hover:not(:disabled):not([type="checkbox"]),
+select:hover:not(:disabled) {
+  border-color: var(--ink-4);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+::selection {
+  color: var(--ink);
+  background: rgba(45, 122, 110, 0.2);
+}
+
 .app-container {
   display: flex;
-  gap: 16px;
-  padding: 16px;
-  height: 100vh;
+  align-items: stretch;
+
+  gap: 12px;
+
   width: 100vw;
-  box-sizing: border-box;
+  height: 100vh;
+
+  padding: 12px;
+
+  overflow: hidden;
+
   background: var(--bg);
 }
 
 .map-container {
-  flex: 1;
-  min-width: 200px;
+  flex: 1 1 auto;
+
+  min-width: 0;
   min-height: 0;
+
+  overflow: hidden;
+
+  border-radius: var(--radius);
+
+  background: #dbe4ee;
+
+  box-shadow: var(--shadow);
 }
 
 .map-container .leaflet-container {
-  border-radius: var(--radius);
-  /* Inset shadow instead of a real border: a border leaves a hairline seam
-     against the clipped tiles at the rounded corners in Firefox. */
-  box-shadow:
-    inset 0 0 0 1px var(--border),
-    var(--shadow);
-  /* Own layer so Firefox clips the transformed tile panes to the radius. */
+  width: 100%;
+  height: 100%;
+
+  font-family: var(--font-sans);
+
   transform: translateZ(0);
 }
 
 .sidebar {
-  padding: 20px 24px;
+  --pad: 18px;
+
   display: flex;
+  flex: 0 0 420px;
   flex-direction: column;
-  /* Fixed width so the sidebar doesn't resize as its content changes. */
-  flex: 0 0 440px;
-  width: 440px;
-  box-sizing: border-box;
-  /* min-height:0 caps the stretched card at container height so content
-     scrolls inside. */
+
+  width: 420px;
   min-height: 0;
-  overflow: auto;
-  background: var(--surface);
+
+  padding: var(--pad);
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  background: var(--sidebar-bg);
+
   border-radius: var(--radius);
-  /* Same framing as the map card. */
-  box-shadow:
-    inset 0 0 0 1px var(--border),
-    var(--shadow);
+
+  box-shadow: var(--shadow);
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 999px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-4);
 }
 
 .sidebar-header {
-  margin-bottom: 20px;
+  margin: 0;
+
+  padding: 4px 3px 4px;
 }
 
-.sidebar-header h2 {
+.sidebar-header h1 {
   margin: 0;
-  font-size: 1.15rem;
-  font-weight: 650;
-  letter-spacing: -0.01em;
+
+  color: var(--ink);
+
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+
+  letter-spacing: -0.015em;
+}
+
+.sidebar-header h1::before {
+  display: none;
 }
 
 .sidebar-header p {
-  margin: 2px 0 0;
-  font-size: 0.85rem;
-  color: var(--text-muted);
+  margin: 4px 0 0;
+
+  color: var(--ink-3);
+
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
 .sidebar-content {
-  margin-bottom: 18px;
+  margin: 16px 0 0;
+
+  padding: 15px;
+
+  background: var(--surface);
+
+  border-radius: var(--radius);
+
+  box-shadow: var(--shadow-sm);
 }
 
-/* Form sections: borderless fieldsets with small uppercase labels */
+.sidebar-content h3 {
+  margin: -2px 0 0;
+
+  color: var(--ink);
+
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.sidebar-content p {
+  margin: 4px 0 0;
+
+  color: var(--ink-3);
+
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.sidebar-content p + fieldset {
+  margin-top: 18px;
+}
+
+.sidebar-content fieldset:empty {
+  display: none;
+}
+
 fieldset {
-  border: none;
-  margin: 0;
-  padding: 0;
   min-width: 0;
+
+  margin: 20px 0 0;
+  padding: 0;
+
+  border: none;
 }
 
 legend {
+  margin: 0 0 7px;
   padding: 0;
-  margin-bottom: 6px;
-  font-size: 0.72rem;
+
+  color: var(--ink-2);
+
+  font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  padding: 8px 10px;
+
+  font-size: 0.88rem;
+}
+
+input[type="number"] {
+  appearance: textfield;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 0.55;
 }
 
 select {
+  appearance: none;
+
   width: 100%;
-  box-sizing: border-box;
+  min-height: 38px;
+
+  padding-right: 32px;
+
+  cursor: pointer;
+
+  background-color: var(--surface);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2366727e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
 }
 
-/* Topic list: scrollable checkbox group, compact and resizable. */
+.api-url-row {
+  display: flex;
+  align-items: stretch;
+
+  gap: 7px;
+}
+
+input[name="apiUrl"] {
+  flex: 1 1 auto;
+
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+input.api-url-input.api-url-input--pending {
+  color: var(--warning);
+
+  border-color: var(--warning-line);
+  background-color: var(--warning-soft);
+}
+
+input.api-url-input.api-url-input--success {
+  border-color: var(--success-line);
+  background-color: var(--success-soft);
+}
+
+input.api-url-input.api-url-input--error {
+  color: var(--danger);
+
+  border-color: var(--danger-line);
+  background-color: var(--danger-soft);
+}
+
+.sidebar-content .api-url-error {
+  margin: 7px 0 0;
+
+  padding: 8px 10px;
+
+  color: var(--danger);
+  background: var(--danger-soft);
+
+  border-left: 3px solid var(--danger);
+  border-radius: var(--radius-sm);
+
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.btn--apply-api-url {
+  display: flex;
+  flex: 0 0 38px;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+
+  padding: 0;
+
+  color: var(--ink-2);
+  background: var(--surface);
+
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.btn--apply-api-url:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+}
+
+.btn--apply-api-url:active {
+  background: var(--accent-soft);
+}
+
+.btn--apply-api-url:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
 .topic-checkbox-list {
   display: flex;
   flex-direction: column;
+
   gap: 2px;
-  min-height: 5em;
-  max-height: 14em;
+
+  min-height: 52px;
+  max-height: 220px;
+
+  padding: 4px;
+
   overflow-y: auto;
   resize: vertical;
-  padding: 4px;
-  border: 1px solid var(--border);
+
+  background: var(--surface-sunken);
+
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
-  background: var(--surface);
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.topic-checkbox-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.topic-checkbox-list::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 999px;
 }
 
 .topic-checkbox {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.9rem;
+
+  gap: 10px;
+
+  min-height: 32px;
+
+  padding: 5px 8px;
+
+  color: var(--ink-2);
+
+  border-radius: 8px;
+
+  font-size: 0.85rem;
+  line-height: 1.3;
+
   cursor: pointer;
+
+  transition: color 0.12s ease;
 }
 
 .topic-checkbox:hover {
-  background: var(--surface-muted);
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.topic-checkbox:has(input:checked) {
+  color: var(--ink-2);
+  background: transparent;
+  font-weight: 400;
 }
 
 .topic-checkbox input {
   flex: none;
-}
 
-.topic-empty {
+  width: 16px;
+  height: 16px;
+
   margin: 0;
-  font-size: 0.85rem;
-  color: var(--text-muted);
+
+  accent-color: var(--accent);
+
+  cursor: pointer;
 }
 
-.api-url-row {
-  display: flex;
-  gap: 8px;
-  align-items: stretch;
-}
-
-input[name='apiUrl'] {
-  flex: 1 1 auto;
+.topic-checkbox span {
   min-width: 0;
-  box-sizing: border-box;
-  font-size: 0.85rem;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Doubled class keeps these above the base input styles in index.css,
-   which are bundled later and would otherwise win the cascade.
-   The 'idle' status has no rule on purpose: it keeps the neutral base border. */
-input.api-url-input.api-url-input--pending {
-  border-color: var(--warning);
-}
+.sidebar-content .topic-empty {
+  margin: 0;
 
-input.api-url-input.api-url-input--success {
-  border-color: var(--success);
-}
+  padding: 10px;
 
-input.api-url-input.api-url-input--error {
-  border-color: var(--danger);
-}
+  color: var(--ink-4);
+  background: var(--surface-sunken);
 
-.btn--apply-api-url {
-  flex: 0 0 auto;
-  width: 34px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-}
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
 
-.btn--apply-api-url:hover {
-  color: var(--text);
-}
-
-.api-url-error {
-  color: var(--danger);
-  font-size: 0.8rem;
-  margin: 6px 0 0;
+  font-size: 0.82rem;
+  text-align: center;
 }
 
 .parameter-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+
+  gap: 10px;
+
+  min-height: 34px;
 }
 
 .parameter-row + .parameter-row {
@@ -189,120 +546,255 @@ input.api-url-input.api-url-input--error {
 }
 
 .parameter-row label {
-  font-size: 0.9rem;
+  flex: 1;
+
+  color: var(--ink-2);
+
+  font-size: 0.86rem;
+  line-height: 1.35;
+
+  cursor: pointer;
+}
+
+.parameter-row input[type="checkbox"] {
+  flex: none;
+
+  width: 16px;
+  height: 16px;
+
+  margin: 0;
+
+  accent-color: var(--accent);
+
+  cursor: pointer;
 }
 
 #count,
-#maxDistanceToNeighbour {
-  width: 6em;
+#maxDistanceToNeighbour,
+#buffer {
+  flex: 0 0 7em;
+
+  width: 7em;
+
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
-.btn--send-geometry {
-  width: 100%;
-  padding: 9px 14px;
-  background-color: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-contrast);
-  font-weight: 600;
-}
-
-.btn--send-geometry:hover {
-  background-color: var(--accent-hover);
-  border-color: var(--accent-hover);
-}
-
-.btn--send-geometry:focus-visible {
-  border-color: var(--accent-hover);
-}
-
-/* Collapsible request preview: URL + body the Send button would post */
 .query-preview {
-  border: 1px solid var(--border);
+  margin-top: 0;
+
+  overflow: hidden;
+
+  background: var(--surface-sunken);
+
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
-  background: var(--surface-muted);
 }
 
 .query-preview > summary {
-  cursor: pointer;
-  padding: 8px 12px;
-  font-size: 0.72rem;
+  display: flex;
+  align-items: center;
+
+  min-height: 38px;
+
+  padding: 8px 10px;
+
+  color: var(--ink-2);
+
+  font-size: 0.84rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-muted);
+
+  cursor: pointer;
   user-select: none;
+
+  transition:
+    color 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.query-preview > summary::before {
+  content: "";
+
+  flex: none;
+
+  width: 0;
+  height: 0;
+
+  margin-right: 9px;
+
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 5px solid var(--ink-4);
+
+  transition:
+    transform 0.2s ease,
+    border-left-color 0.12s ease;
+}
+
+.query-preview > summary::marker {
+  content: "";
+}
+
+.query-preview > summary::-webkit-details-marker {
+  display: none;
+}
+
+.query-preview > summary:hover {
+  color: var(--ink);
+  background: var(--accent-soft);
+}
+
+.query-preview > summary:hover::before {
+  border-left-color: var(--ink-3);
 }
 
 .query-preview > summary:focus-visible {
   outline: none;
-  border-radius: var(--radius-sm);
-  box-shadow: 0 0 0 3px var(--focus-ring);
+  box-shadow: inset 0 0 0 2px var(--focus-ring);
+}
+
+.query-preview[open] > summary::before {
+  transform: rotate(90deg);
+  border-left-color: var(--ink-3);
 }
 
 .query-preview[open] > summary {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--line-strong);
 }
 
 .query-preview__body {
-  margin: 0;
-  padding: 10px 12px;
   max-height: 40vh;
+
+  margin: 0;
+
+  padding: 12px;
+
   overflow: auto;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.75rem;
-  line-height: 1.45;
-  color: var(--text);
+
+  color: var(--ink-2);
+  background: var(--surface);
+
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.55;
+
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
 }
 
-/* Response output: monospace, fills the remaining sidebar height */
-.sidebar textarea {
+.sidebar-button {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+
+  flex: none;
+
+  margin: 16px calc(var(--pad) * -1) 0;
+
+  padding: 12px var(--pad);
+
+  background: var(--sidebar-bg);
+
+  border-top: 1px solid var(--line);
+}
+
+.sidebar-button::after {
+  content: "";
+
+  position: absolute;
+
+  top: 100%;
+  left: 0;
+  right: 0;
+
+  height: var(--pad);
+
+  background: var(--sidebar-bg);
+
+  pointer-events: none;
+}
+
+.btn--send-geometry {
+  display: block;
+
   width: 100%;
-  box-sizing: border-box;
-  resize: none;
-  flex: 1 1 auto;
-  min-height: 120px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.78rem;
-  line-height: 1.45;
-  background: var(--surface-muted);
-  color: var(--text);
+  min-height: 44px;
+
+  padding: 10px 16px;
+
+  color: var(--accent-contrast);
+  background: var(--accent);
+
+  border: 1px solid var(--accent-hover);
+  border-radius: var(--radius-sm);
+
+  box-shadow: none;
+
+  font-size: 0.92rem;
+  font-weight: 650;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
-/* Mobile layout: stack map and sidebar vertically */
-@media (max-width: 768px) {
-  .app-container {
-    flex-direction: column;
-    gap: 10px;
-    padding: 10px;
-    /* Stacked cards can exceed the viewport, so let the page grow and scroll. */
-    height: auto;
-    min-height: 100vh;
-  }
-
-  .map-container {
-    flex: none;
-    height: 50vh;
-  }
-
-  .sidebar {
-    padding: 14px 16px;
-    flex: none;
-    width: auto;
-  }
-
-  .sidebar-content {
-    margin-bottom: 12px;
-  }
+.btn--send-geometry:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
-/* might necessary for react-leaflet-draw */
-.sr-only {
-  display: none;
+.btn--send-geometry:active {
+  transform: none;
+  box-shadow: none;
 }
 
-/* Custom "Clear Responses" toolbar button (mirrors leaflet-draw button style) */
+.btn--send-geometry:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.sidebar textarea {
+  display: block;
+
+  width: 100%;
+  min-height: 180px;
+
+  padding: 12px;
+
+  resize: vertical;
+
+  overflow: auto;
+
+  color: var(--ink-2);
+  background: var(--surface-sunken);
+
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  line-height: 1.55;
+
+  white-space: pre;
+  tab-size: 4;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.sidebar textarea:focus,
+.sidebar textarea:focus-visible {
+  background: var(--surface-sunken);
+
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
 .clear-responses-control {
   position: relative;
 }
@@ -314,49 +806,66 @@ input.api-url-input.api-url-input--error {
 .clear-responses-control a:active,
 .clear-responses-control a:focus {
   display: flex;
+
   align-items: center;
   justify-content: center;
+
   width: 30px;
   height: 30px;
+
+  color: var(--ink-2);
+
   font-size: 18px;
   line-height: 1;
-  color: #464646;
+
   text-decoration: none;
 }
 
 .clear-responses-control a::after {
-  content: '';
+  content: "";
+
   position: absolute;
+
   top: 3px;
   right: 3px;
+
   width: 8px;
   height: 8px;
+
+  background: #f28c28;
+
   border-radius: 50%;
-  background: coral;
+
   box-shadow: 0 0 0 1px #fff;
+
   pointer-events: none;
 }
 
-/* Popup with feature attributes (Leaflet popups stay light in both schemes) */
 .popup-properties {
-  font-size: 0.85em;
-  line-height: 1.2;
   max-width: 340px;
+
+  color: var(--ink);
+
+  font-size: 0.85em;
+  line-height: 1.3;
+
   overflow-wrap: anywhere;
-  color: #1f2937;
 }
 
 .popup-table {
-  border-collapse: collapse;
   width: 100%;
+
+  border-collapse: collapse;
 }
 
 .popup-table th,
 .popup-table td {
+  padding: 6px 10px 6px 0;
+
   text-align: left;
   vertical-align: top;
-  padding: 5px 10px 5px 0;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+
+  border-bottom: 1px solid var(--line);
 }
 
 .popup-properties > .popup-table > tbody > tr > td {
@@ -369,28 +878,33 @@ input.api-url-input.api-url-input--error {
 }
 
 .popup-table th {
+  color: var(--ink-3);
+
   font-weight: 600;
+
   white-space: nowrap;
-  color: #475569;
-  letter-spacing: 0.01em;
 }
 
-/* Visually distinguish nested tables */
 .popup-table .popup-table {
   margin: 0;
-  background: rgba(15, 23, 42, 0.04);
+
+  background: var(--surface-sunken);
+
   border-radius: 4px;
 }
 
 .popup-table .popup-table th,
 .popup-table .popup-table td {
   padding: 3px 8px;
+
   font-size: 0.95em;
-  border-bottom-color: rgba(15, 23, 42, 0.05);
+
+  border-bottom-color: var(--line);
 }
 
 .popup-list {
   margin: 0;
+
   padding-left: 18px;
 }
 
@@ -399,35 +913,179 @@ input.api-url-input.api-url-input--error {
 }
 
 .popup-empty {
-  color: #94a3b8;
+  color: var(--ink-4);
+
   font-style: italic;
 }
 
 .popup-properties a {
-  color: #2563eb;
+  color: var(--accent);
+
   font-weight: 500;
+
   text-decoration: underline;
   text-underline-offset: 2px;
+
   word-break: break-all;
 }
 
 .popup-properties a:hover {
-  color: #1d4ed8;
+  color: var(--accent-hover);
 }
 
-/* Permanent label on the demo data bounding box */
 .leaflet-tooltip.bbox-label {
-  background: rgba(255, 255, 255, 0.7);
-  border: none;
+  padding: 3px 7px;
+
+  color: var(--ink-3);
+
+  background: rgba(255, 255, 255, 0.92);
+
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+
   box-shadow: none;
-  color: #6b7280;
+
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 550;
+
   letter-spacing: 0.02em;
-  padding: 2px 6px;
+
   pointer-events: none;
 }
 
 .leaflet-tooltip.bbox-label::before {
   display: none;
+}
+
+.sr-only {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+
+  clip: rect(0, 0, 0, 0);
+
+  white-space: nowrap;
+
+  border: 0;
+}
+
+@media (max-width: 900px) {
+  .app-container {
+    gap: 10px;
+
+    padding: 10px;
+  }
+
+  .sidebar {
+    --pad: 15px;
+
+    flex-basis: 370px;
+
+    width: 370px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+
+    width: 100%;
+
+    height: auto;
+    min-height: 100vh;
+
+    padding: 8px;
+
+    overflow: auto;
+  }
+
+  .map-container {
+    flex: none;
+
+    width: 100%;
+    height: 45vh;
+    min-height: 280px;
+
+    border-radius: 14px;
+  }
+
+  .sidebar {
+    --pad: 14px;
+
+    flex: none;
+
+    width: 100%;
+
+    overflow: visible;
+  }
+
+  .sidebar-header {
+    padding-bottom: 14px;
+  }
+
+  .sidebar-content {
+    margin-top: 12px;
+
+    padding: 14px;
+  }
+
+  .sidebar-header h1 {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-container {
+    padding: 6px;
+  }
+
+  .sidebar {
+    --pad: 12px;
+  }
+
+  .sidebar-content {
+    padding: 12px;
+  }
+
+  .parameter-row {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 5px;
+  }
+
+  #count,
+  #maxDistanceToNeighbour,
+  #buffer {
+    width: 100%;
+
+    flex: none;
+
+    text-align: left;
+  }
+
+  .btn--send-geometry {
+    min-height: 46px;
+  }
+
+  .topic-checkbox-list {
+    max-height: 180px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+
+    transition: none !important;
+  }
 }

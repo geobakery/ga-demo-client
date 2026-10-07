@@ -8,7 +8,13 @@ import {
 } from 'react-leaflet';
 import L, { LatLngExpression } from 'leaflet';
 import { EditControl } from 'react-leaflet-draw';
-import { Feature, FeatureCollection, Geometry } from 'geojson';
+import {
+  Feature,
+  FeatureCollection,
+  GeoJsonProperties,
+  Geometry,
+} from 'geojson';
+
 import {
   BOUNDING_BOX,
   SHOW_BBOX,
@@ -16,6 +22,8 @@ import {
   SHOW_SAXONY_OUTLINE,
   TILE_LAYER_URL,
   TILE_LAYER_ATTRIBUTION,
+  API_GEOMETRY_STYLE,
+  BUFFER_GEOMETRY_STYLE,
 } from '../config/config';
 import { propertiesToElement } from '../utils/popup';
 import { collectGeometries } from '../utils/geometries';
@@ -45,7 +53,7 @@ interface MapProps {
   initialPosition: LatLngExpression;
   initialZoom: number;
   setUserGeometries: (geometries: Feature<Geometry>[]) => void;
-  apiGeometries: Feature<Geometry>[];
+  apiGeometries: Feature<Geometry, GeoJsonProperties>[];
   clearApiGeometries: () => void;
 }
 
@@ -123,7 +131,11 @@ const Map: React.FC<MapProps> = ({
         <GeoJSON
           key={apiGeometries.length}
           data={apiFeatureCollection}
-          style={{ color: 'coral' }}
+          style={(feature) =>
+            feature?.properties?.__buffer === true
+              ? BUFFER_GEOMETRY_STYLE
+              : API_GEOMETRY_STYLE
+          }
           onEachFeature={onEachApiFeature}
         />
         {apiGeometries.length > 0 && (
