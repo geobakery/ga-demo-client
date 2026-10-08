@@ -23,7 +23,7 @@ import {
 
 interface APICallProps {
   userGeometries: Feature<Geometry>[];
-  addApiGeometries: (geometries: Feature<Geometry>[]) => void;
+  addApiGeometries: (geometries: Feature<Geometry, GeoJsonProperties>[],) => void;
 }
 
 // Parameter state on application start, derived like any interface switch.
@@ -112,6 +112,15 @@ const APICall: React.FC<APICallProps> = ({
     });
   };
 
+  const handleBufferGeometryChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setParameterValues((prev) => ({
+      ...prev,
+      returnBufferGeometry: event.target.checked,
+    }));
+  };
+
   const handleInterfaceChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
@@ -183,7 +192,7 @@ const APICall: React.FC<APICallProps> = ({
       .then((data: Feature<Geometry, GeoJsonProperties>[]) => {
         setResult(JSON.stringify(data, undefined, 4));
 
-        if (returnGeometryChecked) {
+        if (returnGeometryChecked || parameterValues.returnBufferGeometry === true) {
           addApiGeometries(data);
         }
       })
@@ -314,6 +323,37 @@ const APICall: React.FC<APICallProps> = ({
         <div className="sidebar-content">
           <fieldset>
             <legend>Set Parameters</legend>
+            {activeParameters.includes('buffer') &&
+              activeParameters.includes('returnBufferGeometry') && (
+                <>
+                  <legend>Buffer</legend>
+                  <div className="parameter-row">
+                    <input
+                      id="buffer"
+                      type="number"
+                      min="0"
+                      value={parameterValues.buffer ?? ''}
+                      onChange={(e) =>
+                        handleParameterChange('buffer', e.target.value)
+                      }
+                    />
+                    <label htmlFor="buffer">Buffer Distance [m]</label>
+                  </div>
+
+                  <div className="parameter-row">
+                    <input
+                      id="returnBufferGeometry"
+                      type="checkbox"
+                      checked={parameterValues.returnBufferGeometry ?? false}
+                      onChange={handleBufferGeometryChange}
+                    />
+                    <label htmlFor="returnBufferGeometry">
+                      Return Buffer Geometry
+                    </label>
+                  </div>
+                </>
+              )
+            }
             {activeParameters.includes('returnGeometry') && (
               <div className="parameter-row">
                 <input
