@@ -74,8 +74,12 @@ type StyleableLayer = L.Layer & {
   bringToFront?: () => void;
 };
 
-const isStyleable = (layer: L.Layer): layer is StyleableLayer =>
-  typeof (layer as Partial<StyleableLayer>).setStyle === 'function';
+const isStyleable = (layer: L.Layer): layer is StyleableLayer => {
+  return (
+    'setStyle' in layer &&
+    typeof layer.setStyle === 'function'
+  );
+};
 
 // Must match the breakpoint in App.css where the map is stacked above the
 // sidebar.
