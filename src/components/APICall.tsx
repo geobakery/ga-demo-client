@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import {
   INTERFACES,
@@ -23,7 +23,9 @@ import {
 
 interface APICallProps {
   userGeometries: Feature<Geometry>[];
-  addApiGeometries: (geometries: Feature<Geometry, GeoJsonProperties>[],) => void;
+  addApiGeometries: (
+    geometries: Feature<Geometry, GeoJsonProperties>[],
+  ) => void;
 }
 
 // Parameter state on application start, derived like any interface switch.
@@ -53,6 +55,11 @@ const APICall: React.FC<APICallProps> = ({
     INITIAL_SELECTION.parameterValues,
   );
 
+  const [requestHasShadow, setRequestHasShadow] = useState(false);
+
+  const [showApiUrl, setShowApiUrl] = useState(false);
+  const apiConnectionRef = useRef<HTMLDivElement>(null);
+
   // Parameters the user can edit for the selected interface
   const activeParameters = INTERFACE_PARAMETER_MAPPING[selectedInterface];
 
@@ -78,16 +85,86 @@ const APICall: React.FC<APICallProps> = ({
       })
       .catch((error) => {
         if (error.name === 'AbortError') return; // superseded by a newer request
-        console.error('Failed to load topics', error);
+        console.error('Failed to load', error);
         setTopics([]);
         setTopicsError(
-          `Failed to load topics: ${error instanceof Error ? error.message : String(error)}`,
+          `Failed to load: ${error instanceof Error ? error.message : String(error)}`,
         );
         setTopicsStatus('error');
       });
 
     return () => controller.abort();
   }, [apiUrl]);
+
+  // Close the API URL window on a click anywhere outside of it (or Escape).
+  // The connection button belongs to the container, so it can still toggle.
+  useEffect(() => {
+    if (!showApiUrl) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!apiConnectionRef.current?.contains(event.target as Node)) {
+        setShowApiUrl(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setShowApiUrl(false);
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown, true);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown, true);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showApiUrl]);
+
+  useEffect(() => {
+    const sidebar = document.querySelector('.sidebar');
+    const actionArea = document.querySelector('.sidebar-request');
+
+    if (!sidebar || !actionArea) return;
+
+    const contentElements = Array.from(
+      sidebar.querySelectorAll<HTMLElement>('.sidebar-content'),
+    );
+
+    const updateShadow = () => {
+      const actionRect = actionArea.getBoundingClientRect();
+
+      const overlaps = contentElements.some((element) => {
+        const rect = element.getBoundingClientRect();
+
+        return rect.bottom > actionRect.top && rect.top < actionRect.bottom;
+      });
+
+      setRequestHasShadow(overlaps);
+    };
+
+    updateShadow();
+
+    sidebar.addEventListener('scroll', updateShadow, { passive: true });
+    window.addEventListener('resize', updateShadow);
+
+    const resizeObserver = new ResizeObserver(updateShadow);
+
+    // The request area's size can change, e.g. when the preview
+    // is opened/closed.
+    resizeObserver.observe(actionArea);
+
+    // Content areas can also change their size when the selected
+    // interface changes and parameters appear/disappear.
+    contentElements.forEach((element) => {
+      resizeObserver.observe(element);
+    });
+
+    return () => {
+      sidebar.removeEventListener('scroll', updateShadow);
+      window.removeEventListener('resize', updateShadow);
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   // Apply the edited API URL: reset the topic selection and let the effect
   // above reload the available topics from the new URL.
@@ -96,11 +173,12 @@ const APICall: React.FC<APICallProps> = ({
     setApiUrl(normalizeApiUrl(apiUrlDraft));
   };
 
-  // Remove empty values so the parameter is omitted from the request.
-  const handleParameterChange = (
-    key: keyof RequestParameters,
-    value: string,
-  ) => {
+  type NumericParameterKey = Exclude<
+    keyof RequestParameters,
+    'returnBufferGeometry'
+  >;
+
+  const handleParameterChange = (key: NumericParameterKey, value: string) => {
     setParameterValues((prev) => {
       const next = { ...prev };
       if (value === '') {
@@ -121,15 +199,57 @@ const APICall: React.FC<APICallProps> = ({
     }));
   };
 
+  const supportsBuffer = (interfaceName: InterfaceName) => {
+    const parameters = INTERFACE_PARAMETER_MAPPING[interfaceName];
+
+    return (
+      parameters.includes('buffer') &&
+      parameters.includes('returnBufferGeometry')
+    );
+  };
+
   const handleInterfaceChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     // The select only allows valid InterfaceName values.
     const nextInterface = event.target.value as InterfaceName;
+
+    const previousSupportsBuffer = supportsBuffer(selectedInterface);
+    const nextSupportsBuffer = supportsBuffer(nextInterface);
+
+    const previousSupportsReturnGeometry =
+      INTERFACE_PARAMETER_MAPPING[selectedInterface].includes('returnGeometry');
+    const nextSupportsReturnGeometry =
+      INTERFACE_PARAMETER_MAPPING[nextInterface].includes('returnGeometry');
+
     const selection = selectInterface(nextInterface, topics, selectedTopics);
+
+    let nextParameterValues = selection.parameterValues;
+    let nextReturnGeometry = selection.returnGeometry;
+
+    // Preserve buffer settings only while switching directly between
+    // interfaces that both support buffer.
+    if (previousSupportsBuffer && nextSupportsBuffer) {
+      nextParameterValues = {
+        ...nextParameterValues,
+        ...(parameterValues.buffer !== undefined
+          ? { buffer: parameterValues.buffer }
+          : {}),
+        ...(parameterValues.returnBufferGeometry !== undefined
+          ? { returnBufferGeometry: parameterValues.returnBufferGeometry }
+          : {}),
+      };
+    }
+
+    // Preserve Return Result Geometry only while switching directly
+    // between interfaces that both support it.
+    if (previousSupportsReturnGeometry && nextSupportsReturnGeometry) {
+      nextReturnGeometry = returnGeometryChecked;
+    }
+
     setSelectedInterface(nextInterface);
-    setParameterValues(selection.parameterValues);
-    setReturnGeometryChecked(selection.returnGeometry);
+    setParameterValues(nextParameterValues);
+    setReturnGeometryChecked(nextReturnGeometry);
     setSelectedTopics(selection.selectedTopics);
   };
 
@@ -192,7 +312,10 @@ const APICall: React.FC<APICallProps> = ({
       .then((data: Feature<Geometry, GeoJsonProperties>[]) => {
         setResult(JSON.stringify(data, undefined, 4));
 
-        if (returnGeometryChecked || parameterValues.returnBufferGeometry === true) {
+        if (
+          returnGeometryChecked ||
+          parameterValues.returnBufferGeometry === true
+        ) {
           addApiGeometries(data);
         }
       })
@@ -211,6 +334,10 @@ const APICall: React.FC<APICallProps> = ({
     normalizeApiUrl(apiUrlDraft) !== apiUrl ? 'pending' : topicsStatus;
   const apiUrlPending = apiUrlStatus === 'pending';
 
+  const applyButtonLabel = apiUrlPending
+    ? 'Apply URL and load topics'
+    : 'Reload topics';
+
   // Live preview of what Send would post, rebuilt from current selections.
   const { url: previewUrl, body: previewBody } = currentRequest();
   const requestPreview = `POST ${previewUrl}\n\n${JSON.stringify(previewBody, undefined, 2)}`;
@@ -218,38 +345,23 @@ const APICall: React.FC<APICallProps> = ({
   return (
     <div className="sidebar">
       <header className="sidebar-header">
-        <h2>GeospatialAnalyzer Playground</h2>
-        <p>Draw a geometry on the map and query the API.</p>
-      </header>
-      <div className="sidebar-content">
-        <fieldset>
-          <legend>API URL</legend>
-          <div className="api-url-row">
-            <input
-              type="text"
-              name="apiUrl"
-              className={`api-url-input api-url-input--${apiUrlStatus}`}
-              value={apiUrlDraft}
-              onChange={(e) => setApiUrlDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') applyApiUrl();
-              }}
-            />
+        <div className="sidebar-header-main">
+          <div className="sidebar-header-title">
+            <h1>GeospatialAnalyzer Playground</h1>
+            <p>Demo Client for the API.</p>
+          </div>
+
+          <div className="api-connection" ref={apiConnectionRef}>
             <button
               type="button"
-              className="btn--apply-api-url"
-              onClick={applyApiUrl}
-              title={
-                apiUrlPending ? 'Apply URL and load topics' : 'Reload topics'
-              }
-              aria-label={
-                apiUrlPending ? 'Apply URL and load topics' : 'Reload topics'
-              }
+              className={`api-connection-button${showApiUrl ? ' is-open' : ''}`}
+              onClick={() => setShowApiUrl((prev) => !prev)}
+              aria-label="API connection settings"
+              aria-expanded={showApiUrl}
+              title="API connection settings"
             >
               <svg
                 viewBox="0 0 24 24"
-                width="16"
-                height="16"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -257,46 +369,213 @@ const APICall: React.FC<APICallProps> = ({
                 strokeLinejoin="round"
                 aria-hidden="true"
               >
-                {apiUrlPending ? (
-                  // Checkmark: confirm the typed URL and fetch topics from it
-                  <polyline points="20 6 9 17 4 12" />
-                ) : (
-                  // Reload: re-fetch topics from the unchanged URL
-                  <>
-                    <path d="M21 12a9 9 0 1 1-2.64-6.36" />
-                    <polyline points="21 3 21 8 16 8" />
-                  </>
-                )}
+                <path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                <path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
               </svg>
             </button>
+
+            {showApiUrl && (
+              <div className="api-connection-panel">
+                <button
+                  type="button"
+                  className="api-connection-close"
+                  onClick={() => setShowApiUrl(false)}
+                  aria-label="Close API connection settings"
+                  title="Close"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="14"
+                    height="14"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
+                </button>
+                <fieldset>
+                  <legend>API URL</legend>
+
+                  <div className="api-url-row">
+                    <div
+                      className={`api-url-input-wrapper api-url-input-wrapper--${apiUrlStatus}`}
+                    >
+                      <input
+                        type="text"
+                        name="apiUrl"
+                        className="api-url-input"
+                        value={apiUrlDraft}
+                        onChange={(e) => setApiUrlDraft(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') applyApiUrl();
+                        }}
+                      />
+                      <span className="api-url-status" />
+                    </div>
+
+                    <button
+                      type="button"
+                      className="btn--apply-api-url"
+                      onClick={applyApiUrl}
+                      title={applyButtonLabel}
+                      aria-label={applyButtonLabel}
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        {apiUrlPending ? (
+                          <polyline points="20 6 9 17 4 12" />
+                        ) : (
+                          <>
+                            <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                            <polyline points="21 3 21 8 16 8" />
+                          </>
+                        )}
+                      </svg>
+                    </button>
+                  </div>
+
+                  {topicsError && (
+                    <p className="api-url-error">{topicsError}</p>
+                  )}
+                </fieldset>
+              </div>
+            )}
           </div>
-          {topicsError && <p className="api-url-error">{topicsError}</p>}
+        </div>
+      </header>
+
+      <div className="sidebar-content">
+        <h3>Analysis</h3>
+        <p>Configure your spatial query.</p>
+
+        <fieldset>
+          <legend>Choose Tool</legend>
+          <select
+            name="selectedInterface"
+            value={selectedInterface}
+            onChange={handleInterfaceChange}
+          >
+            {INTERFACES.map((iface) => (
+              <option key={iface} value={iface}>
+                {iface}
+              </option>
+            ))}
+          </select>
+        </fieldset>
+
+        <fieldset>
+          <legend>Set Parameters</legend>
+          {activeParameters.length > 0 ? (
+            <>
+              {activeParameters.includes('count') && (
+                <div className="parameter-row">
+                  <input
+                    id="count"
+                    type="number"
+                    value={parameterValues.count ?? ''}
+                    onChange={(e) =>
+                      handleParameterChange('count', e.target.value)
+                    }
+                  />
+                  <label htmlFor="count">Count</label>
+                </div>
+              )}
+
+              {activeParameters.includes('maxDistanceToNeighbour') && (
+                <div className="parameter-row">
+                  <input
+                    id="maxDistanceToNeighbour"
+                    type="number"
+                    value={parameterValues.maxDistanceToNeighbour ?? ''}
+                    onChange={(e) =>
+                      handleParameterChange(
+                        'maxDistanceToNeighbour',
+                        e.target.value,
+                      )
+                    }
+                  />
+                  <label htmlFor="maxDistanceToNeighbour">
+                    Max. Distance to Neighbour [m]
+                  </label>
+                </div>
+              )}
+
+              {activeParameters.includes('returnGeometry') && (
+                <div className="parameter-row">
+                  <input
+                    id="returnGeometry"
+                    type="checkbox"
+                    checked={returnGeometryChecked}
+                    onChange={toggleGeometryCheckbox}
+                  />
+                  <label htmlFor="returnGeometry">Return Result Geometry</label>
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="empty"> Not supported by the selected tool. </p>
+          )}
         </fieldset>
       </div>
+
       <div className="sidebar-content">
+        <h3>Input</h3>
+        <p>Draw a geometry on the map.</p>
+
         <fieldset>
-          <legend>Choose Interface</legend>
-          <label>
-            <select
-              name="selectedInterface"
-              value={selectedInterface}
-              multiple={false}
-              onChange={handleInterfaceChange}
-            >
-              {INTERFACES.map((iface) => (
-                <option key={iface} value={iface}>
-                  {iface}
-                </option>
-              ))}
-            </select>
-          </label>
+          <legend>Buffer</legend>
+
+          {supportsBuffer(selectedInterface) ? (
+            <>
+              <div className="parameter-row">
+                <input
+                  id="buffer"
+                  type="number"
+                  min="0"
+                  value={parameterValues.buffer ?? ''}
+                  onChange={(e) =>
+                    handleParameterChange('buffer', e.target.value)
+                  }
+                />
+                <label htmlFor="buffer">Buffer Distance [m]</label>
+              </div>
+
+              <div className="parameter-row">
+                <input
+                  id="returnBufferGeometry"
+                  type="checkbox"
+                  checked={parameterValues.returnBufferGeometry ?? false}
+                  onChange={handleBufferGeometryChange}
+                />
+                <label htmlFor="returnBufferGeometry">
+                  Return Buffer Geometry
+                </label>
+              </div>
+            </>
+          ) : (
+            <p className="empty">Not supported by the selected tool.</p>
+          )}
         </fieldset>
       </div>
-      <div className="sidebar-content">
+
+      <div className="sidebar-content sidebar-content--topics">
+        <h3>Topics</h3>
+        <p>Select the available datasets to query.</p>
         <fieldset>
-          <legend>Choose Topic(s)</legend>
           {availableTopics.length === 0 ? (
-            <p className="topic-empty">No topics available.</p>
+            <p className="empty">No topics available.</p>
           ) : (
             <div className="topic-checkbox-list">
               {availableTopics.map((topic) => (
@@ -319,100 +598,28 @@ const APICall: React.FC<APICallProps> = ({
           )}
         </fieldset>
       </div>
-      {activeParameters.length > 0 && (
-        <div className="sidebar-content">
-          <fieldset>
-            <legend>Set Parameters</legend>
-            {activeParameters.includes('buffer') &&
-              activeParameters.includes('returnBufferGeometry') && (
-                <>
-                  <legend>Buffer</legend>
-                  <div className="parameter-row">
-                    <input
-                      id="buffer"
-                      type="number"
-                      min="0"
-                      value={parameterValues.buffer ?? ''}
-                      onChange={(e) =>
-                        handleParameterChange('buffer', e.target.value)
-                      }
-                    />
-                    <label htmlFor="buffer">Buffer Distance [m]</label>
-                  </div>
 
-                  <div className="parameter-row">
-                    <input
-                      id="returnBufferGeometry"
-                      type="checkbox"
-                      checked={parameterValues.returnBufferGeometry ?? false}
-                      onChange={handleBufferGeometryChange}
-                    />
-                    <label htmlFor="returnBufferGeometry">
-                      Return Buffer Geometry
-                    </label>
-                  </div>
-                </>
-              )
-            }
-            {activeParameters.includes('returnGeometry') && (
-              <div className="parameter-row">
-                <input
-                  id="returnGeometry"
-                  type="checkbox"
-                  checked={returnGeometryChecked}
-                  onChange={toggleGeometryCheckbox}
-                />
-                <label htmlFor="returnGeometry">Return Geometry</label>
-              </div>
-            )}
-
-            {activeParameters.includes('count') && (
-              <div className="parameter-row">
-                <input
-                  id="count"
-                  type="number"
-                  value={parameterValues.count ?? ''}
-                  onChange={(e) =>
-                    handleParameterChange('count', e.target.value)
-                  }
-                />
-                <label htmlFor="count">Count</label>
-              </div>
-            )}
-
-            {activeParameters.includes('maxDistanceToNeighbour') && (
-              <div className="parameter-row">
-                <input
-                  id="maxDistanceToNeighbour"
-                  type="number"
-                  value={parameterValues.maxDistanceToNeighbour ?? ''}
-                  onChange={(e) =>
-                    handleParameterChange(
-                      'maxDistanceToNeighbour',
-                      e.target.value,
-                    )
-                  }
-                />
-                <label htmlFor="maxDistanceToNeighbour">
-                  Max Distance to Neighbour (meters)
-                </label>
-              </div>
-            )}
-          </fieldset>
-        </div>
-      )}
-      <div className="sidebar-content">
+      <div
+        className={`sidebar-request${requestHasShadow ? ' sidebar-request--shadow' : ''}`}
+      >
         <details className="query-preview">
           <summary>Request preview</summary>
           <pre className="query-preview__body">{requestPreview}</pre>
         </details>
-      </div>
-      <div className="sidebar-content">
+
         <button className="btn--send-geometry" onClick={sendGeometryToAPI}>
-          Send Geometry to API
+          Send Request to API
         </button>
       </div>
-      <textarea value={result} readOnly cols={50} rows={15} />
+
+      <div className="sidebar-content sidebar-content--response">
+        <h3>Response</h3>
+        <p> Click on features in the map to view their properties.</p>
+
+        <fieldset>
+          <textarea value={result} readOnly cols={50} rows={15} />
+        </fieldset>
+      </div>
     </div>
   );
 };

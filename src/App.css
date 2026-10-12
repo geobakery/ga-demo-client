@@ -1,187 +1,691 @@
-/* Map and sidebar as two cards; the gutter lives here so both stretch to
-   equal height. */
+:root {
+  --bg: #e9eee9;
+  --sidebar-bg: #f4f6f3;
+  --surface: #ffffff;
+  --surface-sunken: #f6f8f5;
+
+  --line: #e4e9e3;
+  --line-strong: #d2d9d1;
+
+  --ink: #1f2a27;
+  --ink-2: #44524d;
+  --ink-3: #68756f;
+  --ink-4: #94a09a;
+
+  --accent: #2d7a6e;
+  --accent-hover: #236557;
+  --accent-soft: #e4f1ed;
+  --accent-contrast: #ffffff;
+
+  --success: #1e7b4a;
+
+  --warning: #a15c07;
+
+  --danger: #b42318;
+  --danger-soft: #fdf0ee;
+
+  --focus-ring: rgba(45, 122, 110, 0.28);
+
+  --radius: 18px;
+  --radius-sm: 10px;
+
+  --shadow-sm:
+    0 1px 2px rgba(31, 42, 39, 0.05), 0 2px 10px rgba(31, 42, 39, 0.04);
+
+  --shadow:
+    0 2px 4px rgba(31, 42, 39, 0.04), 0 14px 36px rgba(31, 42, 39, 0.09);
+
+  --font-sans:
+    Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif;
+
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    monospace;
+
+  --app-pad: clamp(4px, 1.2vw, 12px);
+}
+
+* {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+html body {
+  min-width: 0;
+}
+
+html body #root {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  color: var(--ink);
+  background: var(--bg);
+
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.45;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  color: var(--ink);
+  background-color: var(--surface);
+
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+input:hover:not(:disabled):not([type='checkbox']):not(.api-url-input),
+select:hover:not(:disabled) {
+  border-color: var(--ink-4);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+::selection {
+  color: var(--ink);
+  background: rgba(45, 122, 110, 0.2);
+}
+
 .app-container {
   display: flex;
-  gap: 16px;
-  padding: 16px;
+  align-items: stretch;
+
+  gap: clamp(6px, 1.2vw, 12px);
+
+  width: 100%;
+  min-width: 220px;
   height: 100vh;
-  width: 100vw;
-  box-sizing: border-box;
+  height: 100dvh;
+
+  padding: var(--app-pad);
+
+  overflow: hidden;
+
   background: var(--bg);
 }
 
 .map-container {
-  flex: 1;
-  min-width: 200px;
+  flex: 1 1 auto;
+
+  min-width: 0;
   min-height: 0;
+
+  overflow: hidden;
+
+  border-radius: var(--radius);
+
+  background: #dbe4ee;
+
+  box-shadow: var(--shadow);
 }
 
 .map-container .leaflet-container {
-  border-radius: var(--radius);
-  /* Inset shadow instead of a real border: a border leaves a hairline seam
-     against the clipped tiles at the rounded corners in Firefox. */
-  box-shadow:
-    inset 0 0 0 1px var(--border),
-    var(--shadow);
-  /* Own layer so Firefox clips the transformed tile panes to the radius. */
+  width: 100%;
+  height: 100%;
+
+  font-family: var(--font-sans);
+
   transform: translateZ(0);
 }
 
 .sidebar {
-  padding: 20px 24px;
+  --sidebar-w: clamp(280px, 38vw, 420px);
+  --pad: clamp(8px, 1.2vw + 6px, 18px);
+  --card-pad: clamp(8px, 1vw + 7px, 15px);
+  --bar-top: clamp(16px, 4vh, 32px);
+
   display: flex;
+  flex: 0 0 var(--sidebar-w);
   flex-direction: column;
-  /* Fixed width so the sidebar doesn't resize as its content changes. */
-  flex: 0 0 440px;
-  width: 440px;
-  box-sizing: border-box;
-  /* min-height:0 caps the stretched card at container height so content
-     scrolls inside. */
+
+  width: var(--sidebar-w);
+  min-width: 0;
   min-height: 0;
-  overflow: auto;
-  background: var(--surface);
+
+  padding: var(--pad);
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  background: var(--sidebar-bg);
+
   border-radius: var(--radius);
-  /* Same framing as the map card. */
-  box-shadow:
-    inset 0 0 0 1px var(--border),
-    var(--shadow);
+
+  box-shadow: var(--shadow);
 }
 
 .sidebar-header {
-  margin-bottom: 20px;
+  margin: 0 0 10px 0;
+
+  padding: 4px 3px 4px;
 }
 
-.sidebar-header h2 {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 650;
-  letter-spacing: -0.01em;
+.sidebar-header-main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: clamp(6px, 3vw, 12px);
 }
 
-.sidebar-header p {
-  margin: 2px 0 0;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-.sidebar-content {
-  margin-bottom: 18px;
-}
-
-/* Form sections: borderless fieldsets with small uppercase labels */
-fieldset {
-  border: none;
-  margin: 0;
-  padding: 0;
+.sidebar-header-title {
+  flex: 1;
   min-width: 0;
 }
 
-legend {
+.api-connection {
+  position: relative;
+  flex: none;
+}
+
+.api-connection-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  top: -3px;
+
+  width: 36px;
+  height: 36px;
   padding: 0;
-  margin-bottom: 6px;
-  font-size: 0.72rem;
+
+  color: var(--ink-3);
+  background: transparent;
+
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.api-connection-button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.api-connection-button:hover,
+.api-connection-button.is-open {
+  color: var(--ink-2);
+  background: var(--surface-sunken);
+  border-color: var(--line);
+}
+
+.api-connection-button:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.api-connection-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 30;
+
+  width: min(340px, calc(var(--sidebar-w) - 2 * var(--pad) - 6px));
+  padding: 14px;
+
+  background: var(--surface);
+  border: 1px solid var(--ink-4);
+  border-radius: var(--radius);
+
+  box-shadow:
+    0 2px 6px rgba(31, 42, 39, 0.12),
+    0 18px 40px rgba(31, 42, 39, 0.28);
+}
+
+.api-connection-panel fieldset {
+  margin: 0;
+}
+
+.api-connection-panel legend {
+  margin-bottom: 9px;
+  color: var(--ink);
+}
+
+.api-connection-panel .api-url-input-wrapper,
+.api-connection-panel .btn--apply-api-url {
+  border-color: var(--ink-4);
+}
+
+.api-connection-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 26px;
+  height: 26px;
+  padding: 0;
+
+  color: var(--ink-3);
+  background: transparent;
+
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.api-connection-close:hover {
+  color: var(--ink);
+  background: var(--surface-sunken);
+  border-color: var(--line-strong);
+}
+
+.api-connection-close:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.sidebar-header h1 {
+  margin: 0;
+
+  color: var(--ink);
+
+  font-size: clamp(0.95rem, 0.8rem + 0.8vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.25;
+
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+
+.sidebar-header p,
+.sidebar-content p {
+  margin: 4px 0 0;
+  color: var(--ink-3);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.sidebar-content {
+  margin: 16px 0 0;
+
+  padding: var(--card-pad);
+
+  background: var(--surface);
+
+  border-radius: var(--radius);
+
+  box-shadow: var(--shadow-sm);
+}
+
+.sidebar-content h3 {
+  margin: -2px 0 0;
+
+  color: var(--ink);
+
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.sidebar-content p + fieldset {
+  margin-top: 18px;
+}
+
+fieldset {
+  min-width: 0;
+
+  margin: 20px 0 0;
+  padding: 0;
+
+  border: none;
+}
+
+legend {
+  margin: 0 0 7px;
+  padding: 0;
+
+  color: var(--ink-2);
+
+  font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+input[type='text'],
+input[type='number'],
+select,
+textarea {
+  padding: 8px 10px;
+
+  font-size: 0.88rem;
+}
+
+input[type='number'] {
+  appearance: textfield;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  opacity: 0.55;
+  margin-left: 3px;
+  margin-right: -5px;
 }
 
 select {
+  appearance: none;
+
   width: 100%;
-  box-sizing: border-box;
+  min-width: 0;
+  min-height: 38px;
+
+  padding-right: 32px;
+
+  cursor: pointer;
+
+  background-color: var(--surface);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2366727e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
+
+  text-overflow: ellipsis;
 }
 
-/* Topic list: scrollable checkbox group, compact and resizable. */
+.api-url-row {
+  display: flex;
+  align-items: stretch;
+  gap: 7px;
+}
+
+.api-url-input-wrapper {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 38px;
+
+  padding: 0 37px 0 10px;
+
+  background: var(--surface);
+
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.api-url-input-wrapper:hover {
+  border-color: var(--ink-4);
+}
+
+.api-url-input-wrapper:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.api-url-input {
+  width: 100%;
+  min-width: 0;
+  height: auto;
+
+  padding: 0 !important;
+
+  color: var(--ink);
+  background: transparent;
+
+  border: none !important;
+  border-radius: 0;
+
+  outline: none;
+
+  box-shadow: none !important;
+
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+
+  text-overflow: ellipsis;
+}
+
+.api-url-input:hover,
+.api-url-input:focus,
+.api-url-input:focus-visible,
+.api-url-input:active {
+  border: none !important;
+  outline: none;
+  box-shadow: none !important;
+  background: transparent;
+}
+
+.api-url-status {
+  position: absolute;
+
+  top: 50%;
+  right: 14px;
+
+  width: 9px;
+  height: 9px;
+
+  background: var(--ink-4);
+
+  border-radius: 50%;
+
+  transform: translateY(-50%);
+
+  pointer-events: none;
+}
+
+.api-url-input-wrapper--pending .api-url-status {
+  background: var(--warning);
+}
+
+.api-url-input-wrapper--success .api-url-status {
+  background: var(--success);
+}
+
+.api-url-input-wrapper--error .api-url-status {
+  background: var(--danger);
+}
+
+.api-connection-panel .api-url-error {
+  margin: 12px 0 0;
+
+  padding: 8px 10px;
+
+  background: var(--danger-soft);
+
+  border-left: 3px solid var(--danger);
+  border-radius: var(--radius-sm);
+
+  font-size: 0.78rem;
+  line-height: 1.4;
+
+  overflow-wrap: anywhere;
+}
+
+.btn--apply-api-url {
+  flex: 0 0 34px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--ink-3);
+  background: var(--surface);
+
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.btn--apply-api-url:hover {
+  color: var(--ink);
+  background: var(--surface-sunken);
+}
+
+.btn--apply-api-url:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.btn--apply-api-url svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
 .topic-checkbox-list {
   display: flex;
   flex-direction: column;
+
   gap: 2px;
-  min-height: 5em;
-  max-height: 14em;
+
+  min-height: 52px;
+  max-height: clamp(120px, 32vh, 220px);
+
+  padding: 4px;
+
   overflow-y: auto;
   resize: vertical;
-  padding: 4px;
-  border: 1px solid var(--border);
+
+  background: var(--surface-sunken);
+
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
-  background: var(--surface);
 }
 
 .topic-checkbox {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.9rem;
+
+  gap: 10px;
+
+  min-height: 32px;
+
+  padding: 5px 8px;
+
+  color: var(--ink-2);
+
+  border-radius: 8px;
+
+  font-size: 0.85rem;
+  line-height: 1.3;
+
   cursor: pointer;
+
+  transition: color 0.12s ease;
 }
 
 .topic-checkbox:hover {
-  background: var(--surface-muted);
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.topic-checkbox:has(input:checked) {
+  color: var(--ink-2);
+  background: transparent;
+  font-weight: 400;
 }
 
 .topic-checkbox input {
   flex: none;
-}
 
-.topic-empty {
+  width: 16px;
+  height: 16px;
+
   margin: 0;
-  font-size: 0.85rem;
-  color: var(--text-muted);
+
+  accent-color: var(--accent);
+
+  cursor: pointer;
 }
 
-.api-url-row {
-  display: flex;
-  gap: 8px;
-  align-items: stretch;
-}
-
-input[name='apiUrl'] {
-  flex: 1 1 auto;
+.topic-checkbox span {
   min-width: 0;
-  box-sizing: border-box;
-  font-size: 0.85rem;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Doubled class keeps these above the base input styles in index.css,
-   which are bundled later and would otherwise win the cascade.
-   The 'idle' status has no rule on purpose: it keeps the neutral base border. */
-input.api-url-input.api-url-input--pending {
-  border-color: var(--warning);
-}
+.sidebar-content .empty {
+  margin: 0;
 
-input.api-url-input.api-url-input--success {
-  border-color: var(--success);
-}
+  padding: 10px;
 
-input.api-url-input.api-url-input--error {
-  border-color: var(--danger);
-}
+  color: var(--ink-4);
+  background: var(--surface-sunken);
 
-.btn--apply-api-url {
-  flex: 0 0 auto;
-  width: 34px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-}
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
 
-.btn--apply-api-url:hover {
-  color: var(--text);
-}
-
-.api-url-error {
-  color: var(--danger);
-  font-size: 0.8rem;
-  margin: 6px 0 0;
+  font-size: 0.82rem;
+  text-align: center;
 }
 
 .parameter-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+
+  gap: 10px;
+
+  min-height: 34px;
 }
 
 .parameter-row + .parameter-row {
@@ -189,120 +693,294 @@ input.api-url-input.api-url-input--error {
 }
 
 .parameter-row label {
-  font-size: 0.9rem;
+  flex: 1;
+  min-width: 0;
+
+  color: var(--ink-2);
+
+  font-size: 0.86rem;
+  line-height: 1.35;
+
+  overflow-wrap: anywhere;
+
+  cursor: pointer;
+}
+
+.parameter-row input[type='checkbox'] {
+  flex: none;
+
+  width: 16px;
+  height: 16px;
+
+  margin: 0;
+
+  accent-color: var(--accent);
+
+  cursor: pointer;
 }
 
 #count,
-#maxDistanceToNeighbour {
-  width: 6em;
+#maxDistanceToNeighbour,
+#buffer {
+  flex: 0 1 7em;
+
+  width: 7em;
+  min-width: 4.5em;
+
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
-.btn--send-geometry {
-  width: 100%;
-  padding: 9px 14px;
-  background-color: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-contrast);
-  font-weight: 600;
-}
-
-.btn--send-geometry:hover {
-  background-color: var(--accent-hover);
-  border-color: var(--accent-hover);
-}
-
-.btn--send-geometry:focus-visible {
-  border-color: var(--accent-hover);
-}
-
-/* Collapsible request preview: URL + body the Send button would post */
 .query-preview {
-  border: 1px solid var(--border);
+  overflow: hidden;
+
+  background: var(--surface-sunken);
+
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
-  background: var(--surface-muted);
 }
 
 .query-preview > summary {
-  cursor: pointer;
-  padding: 8px 12px;
-  font-size: 0.72rem;
+  display: flex;
+  align-items: center;
+
+  min-height: 38px;
+
+  padding: 8px 10px;
+
+  color: var(--ink-2);
+
+  font-size: 0.84rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-muted);
+
+  cursor: pointer;
   user-select: none;
+
+  transition:
+    color 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.query-preview > summary::before {
+  content: '';
+
+  flex: none;
+
+  width: 0;
+  height: 0;
+
+  margin-right: 9px;
+
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 5px solid var(--ink-4);
+
+  transition:
+    transform 0.2s ease,
+    border-left-color 0.12s ease;
+}
+
+.query-preview > summary::marker {
+  content: '';
+}
+
+.query-preview > summary::-webkit-details-marker {
+  display: none;
+}
+
+.query-preview > summary:hover {
+  color: var(--ink);
+  background: var(--accent-soft);
+}
+
+.query-preview > summary:hover::before {
+  border-left-color: var(--ink-3);
 }
 
 .query-preview > summary:focus-visible {
   outline: none;
-  border-radius: var(--radius-sm);
-  box-shadow: 0 0 0 3px var(--focus-ring);
+  box-shadow: inset 0 0 0 2px var(--focus-ring);
+}
+
+.query-preview[open] > summary::before {
+  transform: rotate(90deg);
+  border-left-color: var(--ink-3);
 }
 
 .query-preview[open] > summary {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--line-strong);
 }
 
 .query-preview__body {
-  margin: 0;
-  padding: 10px 12px;
   max-height: 40vh;
+
+  margin: 0;
+
+  padding: 12px;
+
   overflow: auto;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.75rem;
-  line-height: 1.45;
-  color: var(--text);
+
+  color: var(--ink-2);
+  background: var(--surface);
+
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.55;
+
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
-/* Response output: monospace, fills the remaining sidebar height */
-.sidebar textarea {
-  width: 100%;
-  box-sizing: border-box;
-  resize: none;
-  flex: 1 1 auto;
-  min-height: 120px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.78rem;
-  line-height: 1.45;
-  background: var(--surface-muted);
-  color: var(--text);
+.sidebar-request {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+
+  flex: none;
+
+  margin: 0 calc(var(--pad) * -1);
+  padding: var(--bar-top) var(--pad) 12px;
+
+  background: var(--sidebar-bg);
+
+  transition: box-shadow 0.18s ease;
 }
 
-/* Mobile layout: stack map and sidebar vertically */
-@media (max-width: 768px) {
-  .app-container {
-    flex-direction: column;
-    gap: 10px;
-    padding: 10px;
-    /* Stacked cards can exceed the viewport, so let the page grow and scroll. */
-    height: auto;
-    min-height: 100vh;
-  }
-
-  .map-container {
-    flex: none;
-    height: 50vh;
-  }
-
-  .sidebar {
-    padding: 14px 16px;
-    flex: none;
-    width: auto;
-  }
-
-  .sidebar-content {
-    margin-bottom: 12px;
-  }
+.sidebar-request--shadow {
+  box-shadow:
+    0 -8px 16px rgba(31, 42, 39, 0.06),
+    0 -2px 5px rgba(31, 42, 39, 0.08);
 }
 
-/* might necessary for react-leaflet-draw */
-.sr-only {
+.sidebar-request::after {
+  content: '';
+
+  position: absolute;
+
+  top: 100%;
+  left: 0;
+  right: 0;
+
+  height: var(--pad);
+
+  background: var(--sidebar-bg);
+
+  pointer-events: none;
+}
+
+.sidebar-content--topics {
+  margin-bottom: 12px;
+}
+
+.sidebar-content--response {
+  position: relative;
+  z-index: 11;
+  margin-top: var(--bar-top);
+}
+
+.sidebar-request .query-preview {
+  margin: 0 0 10px;
+}
+
+.feature-info {
   display: none;
+
+  flex: none;
+  min-width: 0;
+
+  margin: 0 0 clamp(8px, 3vw, 16px);
+
+  box-shadow: var(--shadow-sm);
 }
 
-/* Custom "Clear Responses" toolbar button (mirrors leaflet-draw button style) */
+.feature-info__body {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  line-height: 1.3;
+
+  white-space: normal;
+}
+
+.feature-info__body .popup-properties {
+  max-width: none;
+
+  font-size: 1em;
+
+  overflow-wrap: normal;
+}
+
+.feature-info__body .popup-table th,
+.feature-info__body .popup-table td {
+  white-space: nowrap;
+}
+
+.feature-info__body .popup-properties a {
+  word-break: normal;
+}
+
+.btn--send-geometry {
+  display: block;
+
+  width: 100%;
+  min-height: 44px;
+
+  padding: 9px 14px;
+
+  color: var(--accent-contrast);
+  background: var(--accent);
+
+  border: 1px solid var(--accent-hover);
+  border-radius: var(--radius-sm);
+
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.btn--send-geometry:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.btn--send-geometry:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.sidebar textarea {
+  display: block;
+
+  width: 100%;
+  min-width: 0;
+  min-height: clamp(120px, 25vh, 180px);
+
+  padding: 12px;
+
+  resize: vertical;
+
+  overflow: auto;
+
+  color: var(--ink-2);
+  background: var(--surface-sunken);
+
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  line-height: 1.55;
+
+  white-space: pre;
+  tab-size: 4;
+}
+
+.sidebar textarea:focus-visible {
+  border-color: var(--accent);
+}
+
 .clear-responses-control {
   position: relative;
 }
@@ -314,49 +992,66 @@ input.api-url-input.api-url-input--error {
 .clear-responses-control a:active,
 .clear-responses-control a:focus {
   display: flex;
+
   align-items: center;
   justify-content: center;
+
   width: 30px;
   height: 30px;
+
+  color: var(--ink-2);
+
   font-size: 18px;
   line-height: 1;
-  color: #464646;
+
   text-decoration: none;
 }
 
 .clear-responses-control a::after {
   content: '';
+
   position: absolute;
+
   top: 3px;
   right: 3px;
+
   width: 8px;
   height: 8px;
+
+  background: #f28c28;
+
   border-radius: 50%;
-  background: coral;
+
   box-shadow: 0 0 0 1px #fff;
+
   pointer-events: none;
 }
 
-/* Popup with feature attributes (Leaflet popups stay light in both schemes) */
 .popup-properties {
+  max-width: min(340px, 70vw);
+
+  color: var(--ink);
+
   font-size: 0.85em;
-  line-height: 1.2;
-  max-width: 340px;
+  line-height: 1.3;
+
   overflow-wrap: anywhere;
-  color: #1f2937;
 }
 
 .popup-table {
-  border-collapse: collapse;
   width: 100%;
+
+  border-collapse: collapse;
 }
 
 .popup-table th,
 .popup-table td {
+  padding: 6px 10px 6px 0;
+
   text-align: left;
   vertical-align: top;
-  padding: 5px 10px 5px 0;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+
+  border-bottom: 1px solid var(--line);
 }
 
 .popup-properties > .popup-table > tbody > tr > td {
@@ -369,28 +1064,33 @@ input.api-url-input.api-url-input--error {
 }
 
 .popup-table th {
+  color: var(--ink-3);
+
   font-weight: 600;
+
   white-space: nowrap;
-  color: #475569;
-  letter-spacing: 0.01em;
 }
 
-/* Visually distinguish nested tables */
 .popup-table .popup-table {
   margin: 0;
-  background: rgba(15, 23, 42, 0.04);
+
+  background: var(--surface-sunken);
+
   border-radius: 4px;
 }
 
 .popup-table .popup-table th,
 .popup-table .popup-table td {
   padding: 3px 8px;
+
   font-size: 0.95em;
-  border-bottom-color: rgba(15, 23, 42, 0.05);
+
+  border-bottom-color: var(--line);
 }
 
 .popup-list {
   margin: 0;
+
   padding-left: 18px;
 }
 
@@ -399,35 +1099,180 @@ input.api-url-input.api-url-input--error {
 }
 
 .popup-empty {
-  color: #94a3b8;
+  color: var(--ink-4);
+
   font-style: italic;
 }
 
 .popup-properties a {
-  color: #2563eb;
+  color: var(--accent);
+
   font-weight: 500;
+
   text-decoration: underline;
   text-underline-offset: 2px;
+
   word-break: break-all;
 }
 
 .popup-properties a:hover {
-  color: #1d4ed8;
+  color: var(--accent-hover);
 }
 
-/* Permanent label on the demo data bounding box */
 .leaflet-tooltip.bbox-label {
-  background: rgba(255, 255, 255, 0.7);
-  border: none;
+  padding: 3px 7px;
+
+  color: var(--ink-3);
+
+  background: rgba(255, 255, 255, 0.92);
+
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+
   box-shadow: none;
-  color: #6b7280;
+
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 550;
+
   letter-spacing: 0.02em;
-  padding: 2px 6px;
+
   pointer-events: none;
 }
 
 .leaflet-tooltip.bbox-label::before {
   display: none;
+}
+
+.sr-only {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+
+  clip: rect(0, 0, 0, 0);
+
+  white-space: nowrap;
+
+  border: 0;
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    overflow: auto;
+  }
+
+  .map-container {
+    flex: none;
+
+    width: 100%;
+    height: clamp(220px, 45vh, 560px);
+
+    border-radius: 14px;
+  }
+
+  .sidebar {
+    --sidebar-w: calc(100vw - 2 * var(--app-pad));
+
+    flex: none;
+
+    width: 100%;
+
+    overflow: visible;
+  }
+
+  .sidebar-header {
+    padding-bottom: 14px;
+  }
+
+  .sidebar-content {
+    margin-top: 12px;
+  }
+
+  .feature-info {
+    display: block;
+  }
+}
+
+@media (max-width: 480px) {
+  .parameter-row {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 5px;
+  }
+
+  #count,
+  #maxDistanceToNeighbour,
+  #buffer {
+    width: 100%;
+
+    flex: none;
+
+    text-align: left;
+  }
+
+  .btn--send-geometry {
+    min-height: 46px;
+  }
+}
+
+@media (max-width: 360px) {
+  .api-connection-button {
+    width: 32px;
+    height: 32px;
+  }
+
+  .api-connection-panel {
+    padding: 10px;
+  }
+
+  .api-url-row {
+    gap: 5px;
+  }
+
+  .api-url-input-wrapper {
+    padding: 0 28px 0 8px;
+  }
+
+  .api-url-status {
+    right: 11px;
+
+    width: 8px;
+    height: 8px;
+  }
+
+  .btn--apply-api-url {
+    flex-basis: 32px;
+  }
+
+  .query-preview > summary {
+    padding: 8px;
+  }
+
+  .query-preview__body,
+  .sidebar textarea {
+    padding: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+
+    transition: none !important;
+  }
 }
