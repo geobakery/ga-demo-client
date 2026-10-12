@@ -9,7 +9,12 @@ import {
 } from 'react-leaflet';
 import L, { LatLngExpression } from 'leaflet';
 import { EditControl } from 'react-leaflet-draw';
-import { Feature, FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
+import {
+  Feature,
+  FeatureCollection,
+  GeoJsonProperties,
+  Geometry,
+} from 'geojson';
 import {
   BOUNDING_BOX,
   SHOW_BBOX,

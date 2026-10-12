@@ -25,7 +25,10 @@ const FeatureInfo: React.FC<FeatureInfoProps> = ({ properties }) => {
       open
     >
       <summary>Feature Properties</summary>
-      <div ref={containerRef} className="query-preview__body feature-info__body" />
+      <div
+        ref={containerRef}
+        className="query-preview__body feature-info__body"
+      />
     </details>
   );
 };
