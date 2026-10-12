@@ -75,10 +75,7 @@ type StyleableLayer = L.Layer & {
 };
 
 const isStyleable = (layer: L.Layer): layer is StyleableLayer => {
-  return (
-    'setStyle' in layer &&
-    typeof layer.setStyle === 'function'
-  );
+  return 'setStyle' in layer && typeof layer.setStyle === 'function';
 };
 
 // Must match the breakpoint in App.css where the map is stacked above the
