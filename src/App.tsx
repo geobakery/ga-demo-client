@@ -20,6 +20,7 @@ const App: React.FC = () => {
     newGeometries: Feature<Geometry, GeoJsonProperties>[],
   ) => {
     setApiGeometries((prev) => [...prev, ...newGeometries]);
+    setApiGeometries((prev) => [...prev, ...newGeometries]);
   };
 
   const clearApiGeometries = () => {

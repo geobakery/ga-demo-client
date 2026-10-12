@@ -26,6 +26,9 @@ interface APICallProps {
   addApiGeometries: (
     geometries: Feature<Geometry, GeoJsonProperties>[],
   ) => void;
+  addApiGeometries: (
+    geometries: Feature<Geometry, GeoJsonProperties>[],
+  ) => void;
 }
 
 // Parameter state on application start, derived like any interface switch.
@@ -312,6 +315,10 @@ const APICall: React.FC<APICallProps> = ({
       .then((data: Feature<Geometry, GeoJsonProperties>[]) => {
         setResult(JSON.stringify(data, undefined, 4));
 
+        if (
+          returnGeometryChecked ||
+          parameterValues.returnBufferGeometry === true
+        ) {
         if (
           returnGeometryChecked ||
           parameterValues.returnBufferGeometry === true

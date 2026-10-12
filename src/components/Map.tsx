@@ -24,6 +24,8 @@ import {
   TILE_LAYER_ATTRIBUTION,
   API_GEOMETRY_STYLE,
   BUFFER_GEOMETRY_STYLE,
+  API_GEOMETRY_STYLE,
+  BUFFER_GEOMETRY_STYLE,
 } from '../config/config';
 import { propertiesToElement } from '../utils/popup';
 import { collectGeometries } from '../utils/geometries';
@@ -111,6 +113,7 @@ interface MapProps {
   initialPosition: LatLngExpression;
   initialZoom: number;
   setUserGeometries: (geometries: Feature<Geometry>[]) => void;
+  apiGeometries: Feature<Geometry, GeoJsonProperties>[];
   apiGeometries: Feature<Geometry, GeoJsonProperties>[];
   clearApiGeometries: () => void;
   onFeatureSelect: (properties: GeoJsonProperties) => void;
