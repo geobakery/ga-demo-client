@@ -9,12 +9,7 @@ import {
 } from 'react-leaflet';
 import L, { LatLngExpression } from 'leaflet';
 import { EditControl } from 'react-leaflet-draw';
-import {
-  Feature,
-  FeatureCollection,
-  GeoJsonProperties,
-  Geometry,
-} from 'geojson';
+import { Feature, FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 import {
   BOUNDING_BOX,
   SHOW_BBOX,
@@ -22,8 +17,6 @@ import {
   SHOW_SAXONY_OUTLINE,
   TILE_LAYER_URL,
   TILE_LAYER_ATTRIBUTION,
-  API_GEOMETRY_STYLE,
-  BUFFER_GEOMETRY_STYLE,
   API_GEOMETRY_STYLE,
   BUFFER_GEOMETRY_STYLE,
 } from '../config/config';
@@ -113,7 +106,6 @@ interface MapProps {
   initialPosition: LatLngExpression;
   initialZoom: number;
   setUserGeometries: (geometries: Feature<Geometry>[]) => void;
-  apiGeometries: Feature<Geometry, GeoJsonProperties>[];
   apiGeometries: Feature<Geometry, GeoJsonProperties>[];
   clearApiGeometries: () => void;
   onFeatureSelect: (properties: GeoJsonProperties) => void;

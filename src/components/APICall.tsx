@@ -23,12 +23,7 @@ import {
 
 interface APICallProps {
   userGeometries: Feature<Geometry>[];
-  addApiGeometries: (
-    geometries: Feature<Geometry, GeoJsonProperties>[],
-  ) => void;
-  addApiGeometries: (
-    geometries: Feature<Geometry, GeoJsonProperties>[],
-  ) => void;
+  addApiGeometries: (geometries: Feature<Geometry, GeoJsonProperties>[],) => void;
 }
 
 // Parameter state on application start, derived like any interface switch.
@@ -139,7 +134,10 @@ const APICall: React.FC<APICallProps> = ({
       const overlaps = contentElements.some((element) => {
         const rect = element.getBoundingClientRect();
 
-        return rect.bottom > actionRect.top && rect.top < actionRect.bottom;
+        return (
+          rect.bottom > actionRect.top &&
+          rect.top < actionRect.bottom
+        );
       });
 
       setRequestHasShadow(overlaps);
@@ -181,7 +179,10 @@ const APICall: React.FC<APICallProps> = ({
     'returnBufferGeometry'
   >;
 
-  const handleParameterChange = (key: NumericParameterKey, value: string) => {
+  const handleParameterChange = (
+    key: NumericParameterKey,
+    value: string,
+  ) => {
     setParameterValues((prev) => {
       const next = { ...prev };
       if (value === '') {
@@ -221,9 +222,13 @@ const APICall: React.FC<APICallProps> = ({
     const nextSupportsBuffer = supportsBuffer(nextInterface);
 
     const previousSupportsReturnGeometry =
-      INTERFACE_PARAMETER_MAPPING[selectedInterface].includes('returnGeometry');
+      INTERFACE_PARAMETER_MAPPING[selectedInterface].includes(
+        'returnGeometry',
+      );
     const nextSupportsReturnGeometry =
-      INTERFACE_PARAMETER_MAPPING[nextInterface].includes('returnGeometry');
+      INTERFACE_PARAMETER_MAPPING[nextInterface].includes(
+        'returnGeometry',
+      );
 
     const selection = selectInterface(nextInterface, topics, selectedTopics);
 
@@ -315,14 +320,7 @@ const APICall: React.FC<APICallProps> = ({
       .then((data: Feature<Geometry, GeoJsonProperties>[]) => {
         setResult(JSON.stringify(data, undefined, 4));
 
-        if (
-          returnGeometryChecked ||
-          parameterValues.returnBufferGeometry === true
-        ) {
-        if (
-          returnGeometryChecked ||
-          parameterValues.returnBufferGeometry === true
-        ) {
+        if (returnGeometryChecked || parameterValues.returnBufferGeometry === true) {
           addApiGeometries(data);
         }
       })
@@ -342,8 +340,8 @@ const APICall: React.FC<APICallProps> = ({
   const apiUrlPending = apiUrlStatus === 'pending';
 
   const applyButtonLabel = apiUrlPending
-    ? 'Apply URL and load topics'
-    : 'Reload topics';
+  ? 'Apply URL and load topics'
+  : 'Reload topics';
 
   // Live preview of what Send would post, rebuilt from current selections.
   const { url: previewUrl, body: previewBody } = currentRequest();
@@ -390,17 +388,9 @@ const APICall: React.FC<APICallProps> = ({
                   aria-label="Close API connection settings"
                   title="Close"
                 >
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="14"
-                    height="14"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none"
+                    stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
+                    strokeLinejoin="round" aria-hidden="true">
                     <path d="M18 6 6 18" />
                     <path d="m6 6 12 12" />
                   </svg>
@@ -527,7 +517,9 @@ const APICall: React.FC<APICallProps> = ({
                     checked={returnGeometryChecked}
                     onChange={toggleGeometryCheckbox}
                   />
-                  <label htmlFor="returnGeometry">Return Result Geometry</label>
+                  <label htmlFor="returnGeometry">
+                    Return Result Geometry
+                  </label>
                 </div>
               )}
             </>
@@ -535,7 +527,7 @@ const APICall: React.FC<APICallProps> = ({
             <p className="empty"> Not supported by the selected tool. </p>
           )}
         </fieldset>
-      </div>
+    </div>
 
       <div className="sidebar-content">
         <h3>Input</h3>
@@ -572,7 +564,9 @@ const APICall: React.FC<APICallProps> = ({
               </div>
             </>
           ) : (
-            <p className="empty">Not supported by the selected tool.</p>
+            <p className="empty">
+              Not supported by the selected tool.
+            </p>
           )}
         </fieldset>
       </div>
@@ -606,15 +600,16 @@ const APICall: React.FC<APICallProps> = ({
         </fieldset>
       </div>
 
-      <div
-        className={`sidebar-request${requestHasShadow ? ' sidebar-request--shadow' : ''}`}
-      >
+      <div className={`sidebar-request${requestHasShadow ? ' sidebar-request--shadow' : ''}`}>
         <details className="query-preview">
           <summary>Request preview</summary>
           <pre className="query-preview__body">{requestPreview}</pre>
         </details>
 
-        <button className="btn--send-geometry" onClick={sendGeometryToAPI}>
+        <button
+          className="btn--send-geometry"
+          onClick={sendGeometryToAPI}
+        >
           Send Request to API
         </button>
       </div>
