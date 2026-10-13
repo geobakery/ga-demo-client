@@ -4,16 +4,6 @@
   scrollbar-color: var(--line-strong) transparent;
 }
 
-html body {
-  min-width: 0;
-}
-
-html body #root {
-  max-width: none;
-  margin: 0;
-  padding: 0;
-}
-
 html,
 body,
 #root {
