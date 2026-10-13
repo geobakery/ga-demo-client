@@ -593,7 +593,13 @@ const APICall: React.FC<APICallProps> = ({
         <p>Click on features in the map to view their properties.</p>
 
         <fieldset>
-          <textarea value={result} readOnly cols={50} rows={15} />
+          {/* Compact placeholder until a response arrives, so the sidebar
+              doesn't reserve space for an empty field. */}
+          {result ? (
+            <textarea value={result} readOnly cols={50} rows={15} />
+          ) : (
+            <p className="empty">No response yet.</p>
+          )}
         </fieldset>
       </div>
     </div>
