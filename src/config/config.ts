@@ -46,6 +46,15 @@ export const BUFFER_GEOMETRY_STYLE: PathOptions = {
   fillOpacity: 0.08,
 };
 
+// Style of the clicked result geometry: thick purple outline, light purple fill.
+export const SELECTED_GEOMETRY_STYLE: PathOptions = {
+  color: '#7c3aed',
+  weight: 4,
+  opacity: 1,
+  fillColor: '#7c3aed',
+  fillOpacity: 0.3,
+};
+
 // Parameters editable in the UI.
 export type ParameterName = 'returnGeometry' | keyof RequestParameters;
 

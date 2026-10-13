@@ -24,6 +24,7 @@ import {
   TILE_LAYER_ATTRIBUTION,
   API_GEOMETRY_STYLE,
   BUFFER_GEOMETRY_STYLE,
+  SELECTED_GEOMETRY_STYLE,
 } from '../config/config';
 import { propertiesToElement } from '../utils/popup';
 import { collectGeometries } from '../utils/geometries';
@@ -47,15 +48,6 @@ const SAXONY_BORDER_STYLE: L.PathOptions = {
   weight: 2,
   opacity: 0.8,
   fill: false,
-};
-
-// Style of the clicked result geometry: thick purple outline, light purple fill.
-const SELECTED_GEOMETRY_STYLE: L.PathOptions = {
-  color: '#7c3aed',
-  weight: 4,
-  opacity: 1,
-  fillColor: '#7c3aed',
-  fillOpacity: 0.3,
 };
 
 // Defined once on purpose: react-leaflet re-applies the style prop to all
