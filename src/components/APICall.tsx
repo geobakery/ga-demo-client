@@ -214,42 +214,15 @@ const APICall: React.FC<APICallProps> = ({
     // The select only allows valid InterfaceName values.
     const nextInterface = event.target.value as InterfaceName;
 
-    const previousSupportsBuffer = supportsBuffer(selectedInterface);
-    const nextSupportsBuffer = supportsBuffer(nextInterface);
-
-    const previousSupportsReturnGeometry =
-      INTERFACE_PARAMETER_MAPPING[selectedInterface].includes('returnGeometry');
-    const nextSupportsReturnGeometry =
-      INTERFACE_PARAMETER_MAPPING[nextInterface].includes('returnGeometry');
-
-    const selection = selectInterface(nextInterface, topics, selectedTopics);
-
-    let nextParameterValues = selection.parameterValues;
-    let nextReturnGeometry = selection.returnGeometry;
-
-    // Preserve buffer settings only while switching directly between
-    // interfaces that both support buffer.
-    if (previousSupportsBuffer && nextSupportsBuffer) {
-      nextParameterValues = {
-        ...nextParameterValues,
-        ...(parameterValues.buffer !== undefined
-          ? { buffer: parameterValues.buffer }
-          : {}),
-        ...(parameterValues.returnBufferGeometry !== undefined
-          ? { returnBufferGeometry: parameterValues.returnBufferGeometry }
-          : {}),
-      };
-    }
-
-    // Preserve Return Result Geometry only while switching directly
-    // between interfaces that both support it.
-    if (previousSupportsReturnGeometry && nextSupportsReturnGeometry) {
-      nextReturnGeometry = returnGeometryChecked;
-    }
+    const selection = selectInterface(nextInterface, topics, selectedTopics, {
+      interfaceName: selectedInterface,
+      parameterValues,
+      returnGeometry: returnGeometryChecked,
+    });
 
     setSelectedInterface(nextInterface);
-    setParameterValues(nextParameterValues);
-    setReturnGeometryChecked(nextReturnGeometry);
+    setParameterValues(selection.parameterValues);
+    setReturnGeometryChecked(selection.returnGeometry);
     setSelectedTopics(selection.selectedTopics);
   };
 
