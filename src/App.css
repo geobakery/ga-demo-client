@@ -39,9 +39,9 @@ input,
 select,
 textarea {
   color: var(--ink);
-  background-color: var(--surface);
+  background-color: var(--field);
 
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--field-border);
   border-radius: var(--radius-sm);
 
   outline: none;
@@ -54,7 +54,7 @@ textarea {
 
 input:hover:not(:disabled):not([type='checkbox']):not(.api-url-input),
 select:hover:not(:disabled) {
-  border-color: var(--ink-4);
+  border-color: var(--ink-3);
 }
 
 input:focus-visible,
@@ -138,6 +138,7 @@ textarea:focus-visible {
 
   background: var(--sidebar-bg);
 
+  border: 1px solid var(--card-border);
   border-radius: var(--radius);
 
   box-shadow: var(--shadow);
@@ -232,11 +233,6 @@ textarea:focus-visible {
   color: var(--ink);
 }
 
-.api-connection-panel .api-url-input-wrapper,
-.api-connection-panel .btn--apply-api-url {
-  border-color: var(--ink-4);
-}
-
 .api-connection-close {
   position: absolute;
   top: 8px;
@@ -302,6 +298,7 @@ textarea:focus-visible {
 
   background: var(--surface);
 
+  border: 1px solid var(--card-border);
   border-radius: var(--radius);
 
   box-shadow: var(--shadow-sm);
@@ -368,7 +365,7 @@ select {
 
   cursor: pointer;
 
-  background-color: var(--surface);
+  background-color: var(--field);
   background-image: var(--select-arrow);
   background-repeat: no-repeat;
   background-position: right 11px center;
@@ -394,9 +391,9 @@ select {
 
   padding: 0 37px 0 10px;
 
-  background: var(--surface);
+  background: var(--field);
 
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--field-border);
   border-radius: var(--radius-sm);
 
   transition:
@@ -406,7 +403,7 @@ select {
 }
 
 .api-url-input-wrapper:hover {
-  border-color: var(--ink-4);
+  border-color: var(--ink-3);
 }
 
 .api-url-input-wrapper:focus-within {
@@ -503,9 +500,9 @@ select {
   justify-content: center;
 
   color: var(--ink-3);
-  background: var(--surface);
+  background: var(--field);
 
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--field-border);
   border-radius: var(--radius-sm);
 
   transition:
@@ -617,7 +614,7 @@ select {
 
   padding: 10px;
 
-  color: var(--ink-4);
+  color: var(--ink-3);
   background: var(--surface-sunken);
 
   border: 1px dashed var(--line-strong);
@@ -1045,7 +1042,7 @@ select {
 }
 
 .popup-empty {
-  color: var(--ink-4);
+  color: var(--ink-3);
 
   font-style: italic;
 }

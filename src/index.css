@@ -9,10 +9,15 @@
   --sidebar-bg: #f4f6f3;
   --surface: #ffffff;
   --surface-sunken: #f6f8f5;
+  --field: #ffffff;
   --map-bg: #dbe4ee;
 
   --line: #e4e9e3;
   --line-strong: #d2d9d1;
+  --card-border: transparent;
+  /* Borders of inputs and selects need 3:1 against their background
+     (WCAG 1.4.11). */
+  --field-border: #8a958f;
 
   --ink: #1f2a27;
   --ink-2: #44524d;
@@ -71,20 +76,26 @@
 }
 
 @media (prefers-color-scheme: dark) {
+  /* Higher layers are lighter; cards get a border because shadows don't
+     show on dark backgrounds. Neutrals are kept cool so only the accent
+     carries color. */
   :root {
-    --bg: #111514;
-    --sidebar-bg: #171c1a;
-    --surface: #1e2422;
-    --surface-sunken: #191e1c;
+    --bg: #0e1113;
+    --sidebar-bg: #15191c;
+    --surface: #1f2428;
+    --surface-sunken: #1a1e21;
+    --field: #272d32;
     --map-bg: #1b2126;
 
-    --line: #2a3230;
-    --line-strong: #3a4441;
+    --line: #323a40;
+    --line-strong: #3d454b;
+    --card-border: var(--line);
+    --field-border: #6f7a81;
 
-    --ink: #e4e9e6;
-    --ink-2: #c0c9c5;
-    --ink-3: #95a19c;
-    --ink-4: #6c7874;
+    --ink: #e6eaec;
+    --ink-2: #c3cacd;
+    --ink-3: #9aa4a9;
+    --ink-4: #7d888e;
 
     --accent: #4fae9e;
     --accent-hover: #6cc2b3;
@@ -105,7 +116,7 @@
       0 2px 6px rgba(0, 0, 0, 0.4), 0 18px 40px rgba(0, 0, 0, 0.5);
     --shadow-up: 0 -8px 16px rgba(0, 0, 0, 0.25), 0 -2px 5px rgba(0, 0, 0, 0.3);
 
-    --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2395a19c' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa4a9' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   }
 }
 
