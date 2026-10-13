@@ -351,7 +351,6 @@ input[type='number']::-webkit-inner-spin-button,
 input[type='number']::-webkit-outer-spin-button {
   opacity: 0.55;
   margin-left: 3px;
-  margin-right: -5px;
 }
 
 select {
@@ -667,13 +666,12 @@ select {
 #count,
 #maxDistanceToNeighbour,
 #buffer {
-  flex: 0 1 7em;
+  flex: none;
 
-  width: 7em;
-  min-width: 4.5em;
+  /* Five digits (buffer max is 20000) plus padding and spin buttons. */
+  width: calc(5ch + 3.5em);
 
   font-variant-numeric: tabular-nums;
-  text-align: right;
 }
 
 .query-preview {
@@ -1162,8 +1160,6 @@ select {
     width: 100%;
 
     flex: none;
-
-    text-align: left;
   }
 
   .btn--send-geometry {
