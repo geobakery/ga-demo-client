@@ -350,10 +350,6 @@ textarea {
   font-size: 0.88rem;
 }
 
-input[type='number'] {
-  appearance: textfield;
-}
-
 input[type='number']::-webkit-inner-spin-button,
 input[type='number']::-webkit-outer-spin-button {
   opacity: 0.55;
