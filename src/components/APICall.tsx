@@ -85,10 +85,10 @@ const APICall: React.FC<APICallProps> = ({
       })
       .catch((error) => {
         if (error.name === 'AbortError') return; // superseded by a newer request
-        console.error('Failed to load', error);
+        console.error('Failed to load topics', error);
         setTopics([]);
         setTopicsError(
-          `Failed to load: ${error instanceof Error ? error.message : String(error)}`,
+          `Failed to load topics: ${error instanceof Error ? error.message : String(error)}`,
         );
         setTopicsStatus('error');
       });
@@ -498,7 +498,7 @@ const APICall: React.FC<APICallProps> = ({
               )}
             </>
           ) : (
-            <p className="empty"> Not supported by the selected tool. </p>
+            <p className="empty">Not supported by the selected tool.</p>
           )}
         </fieldset>
       </div>
@@ -587,7 +587,7 @@ const APICall: React.FC<APICallProps> = ({
 
       <div className="sidebar-content sidebar-content--response">
         <h3>Response</h3>
-        <p> Click on features in the map to view their properties.</p>
+        <p>Click on features in the map to view their properties.</p>
 
         <fieldset>
           <textarea value={result} readOnly cols={50} rows={15} />
