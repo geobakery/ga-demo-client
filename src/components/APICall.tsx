@@ -56,6 +56,8 @@ const APICall: React.FC<APICallProps> = ({
   );
 
   const [requestHasShadow, setRequestHasShadow] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const requestAreaRef = useRef<HTMLDivElement>(null);
 
   const [showApiUrl, setShowApiUrl] = useState(false);
   const apiConnectionRef = useRef<HTMLDivElement>(null);
@@ -121,19 +123,19 @@ const APICall: React.FC<APICallProps> = ({
   }, [showApiUrl]);
 
   useEffect(() => {
-    const sidebar = document.querySelector('.sidebar');
-    const actionArea = document.querySelector('.sidebar-request');
+    const sidebar = sidebarRef.current;
+    const actionArea = requestAreaRef.current;
 
     if (!sidebar || !actionArea) return;
 
-    const contentElements = Array.from(
-      sidebar.querySelectorAll<HTMLElement>('.sidebar-content'),
-    );
+    // Queried per update so conditionally rendered sections are included.
+    const getContentElements = () =>
+      Array.from(sidebar.querySelectorAll<HTMLElement>('.sidebar-content'));
 
     const updateShadow = () => {
       const actionRect = actionArea.getBoundingClientRect();
 
-      const overlaps = contentElements.some((element) => {
+      const overlaps = getContentElements().some((element) => {
         const rect = element.getBoundingClientRect();
 
         return rect.bottom > actionRect.top && rect.top < actionRect.bottom;
@@ -155,7 +157,7 @@ const APICall: React.FC<APICallProps> = ({
 
     // Content areas can also change their size when the selected
     // interface changes and parameters appear/disappear.
-    contentElements.forEach((element) => {
+    getContentElements().forEach((element) => {
       resizeObserver.observe(element);
     });
 
@@ -316,7 +318,7 @@ const APICall: React.FC<APICallProps> = ({
   const requestPreview = `POST ${previewUrl}\n\n${JSON.stringify(previewBody, undefined, 2)}`;
 
   return (
-    <div className="sidebar">
+    <div className="sidebar" ref={sidebarRef}>
       <header className="sidebar-header">
         <div className="sidebar-header-main">
           <div className="sidebar-header-title">
@@ -573,6 +575,7 @@ const APICall: React.FC<APICallProps> = ({
       </div>
 
       <div
+        ref={requestAreaRef}
         className={`sidebar-request${requestHasShadow ? ' sidebar-request--shadow' : ''}`}
       >
         <details className="query-preview">
