@@ -64,6 +64,12 @@ textarea:focus-visible {
   box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
+/* Firefox makes scroll containers focusable; keep their default outline in
+   the accent color instead of the browser blue. */
+:focus-visible {
+  outline-color: var(--accent);
+}
+
 ::selection {
   color: var(--ink);
   background: var(--selection);
@@ -547,6 +553,12 @@ select {
 
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
+}
+
+.topic-checkbox-list:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .topic-checkbox {
