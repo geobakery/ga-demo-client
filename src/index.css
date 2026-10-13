@@ -118,39 +118,7 @@ a:hover {
   color: var(--accent-hover);
 }
 
-/* Form controls: shared, consistent appearance */
-input[type='text'],
-input[type='number'],
-select,
-textarea {
-  font-family: inherit;
-  font-size: 0.9rem;
-  color: var(--ink);
-  background-color: var(--surface);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-sm);
-  padding: 6px 10px;
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
-}
-
-input[type='text']:hover,
-input[type='number']:hover,
-select:hover,
-textarea:hover {
-  border-color: var(--ink-4);
-}
-
-input[type='text']:focus-visible,
-input[type='number']:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--focus-ring);
-}
-
+/* Text inputs, selects and textareas are styled in App.css. */
 input[type='checkbox'] {
   accent-color: var(--accent);
   width: 15px;
