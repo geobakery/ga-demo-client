@@ -36,6 +36,9 @@ const APICall: React.FC<APICallProps> = ({
   addApiGeometries,
 }) => {
   const [result, setResult] = useState('');
+  // Bumped on every new result, so even an identical response scrolls into view
+  const [resultVersion, setResultVersion] = useState(0);
+  const responseRef = useRef<HTMLDivElement>(null);
   const [apiUrl, setApiUrl] = useState<string>(resolveApiUrl(DEFAULT_API_URL));
   const [apiUrlDraft, setApiUrlDraft] = useState<string>(
     resolveApiUrl(DEFAULT_API_URL),
@@ -168,6 +171,26 @@ const APICall: React.FC<APICallProps> = ({
     };
   }, []);
 
+  // Scroll to the response once it has rendered. scrollIntoView picks the
+  // scrolling ancestor: the sidebar on desktop, the page on mobile.
+  useEffect(() => {
+    if (resultVersion === 0) return;
+
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+
+    responseRef.current?.scrollIntoView({
+      behavior: reduceMotion ? 'auto' : 'smooth',
+      block: 'start',
+    });
+  }, [resultVersion]);
+
+  const showResult = (text: string) => {
+    setResult(text);
+    setResultVersion((prev) => prev + 1);
+  };
+
   // Apply the edited API URL: reset the topic selection and let the effect
   // above reload the available topics from the new URL.
   const applyApiUrl = () => {
@@ -254,7 +277,7 @@ const APICall: React.FC<APICallProps> = ({
     const problem = validateGeometries(selectedInterface, userGeometries);
     if (problem) {
       console.error(problem);
-      setResult(problem);
+      showResult(problem);
       return;
     }
 
@@ -285,7 +308,7 @@ const APICall: React.FC<APICallProps> = ({
         return response.json();
       })
       .then((data: Feature<Geometry, GeoJsonProperties>[]) => {
-        setResult(JSON.stringify(data, undefined, 4));
+        showResult(JSON.stringify(data, undefined, 4));
 
         if (
           returnGeometryChecked ||
@@ -296,7 +319,7 @@ const APICall: React.FC<APICallProps> = ({
       })
       .catch((error) => {
         console.error('Request failed', error);
-        setResult(
+        showResult(
           `Request failed: ${error instanceof Error ? error.message : String(error)}`,
         );
       });
@@ -588,7 +611,10 @@ const APICall: React.FC<APICallProps> = ({
         </button>
       </div>
 
-      <div className="sidebar-content sidebar-content--response">
+      <div
+        className="sidebar-content sidebar-content--response"
+        ref={responseRef}
+      >
         <h3>Response</h3>
         <p>Click on features in the map to view their properties.</p>
 
