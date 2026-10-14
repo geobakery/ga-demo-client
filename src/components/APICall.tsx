@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import {
   INTERFACES,
@@ -20,6 +20,7 @@ import {
   selectInterface,
   topicsForInterface,
 } from '../utils/interfaceSelection';
+import ResponseActions from './ResponseActions';
 
 interface APICallProps {
   userGeometries: Feature<Geometry>[];
@@ -39,6 +40,8 @@ const APICall: React.FC<APICallProps> = ({
   // Bumped on every new result, so even an identical response scrolls into view
   const [resultVersion, setResultVersion] = useState(0);
   const responseRef = useRef<HTMLDivElement>(null);
+  // Full view of the response (fills the whole sidebar)
+  const [responseExpanded, setResponseExpanded] = useState(false);
   const [apiUrl, setApiUrl] = useState<string>(resolveApiUrl(DEFAULT_API_URL));
   const [apiUrlDraft, setApiUrlDraft] = useState<string>(
     resolveApiUrl(DEFAULT_API_URL),
@@ -185,6 +188,16 @@ const APICall: React.FC<APICallProps> = ({
       block: 'start',
     });
   }, [resultVersion]);
+
+  // Restore the scroll position after leaving the full view,
+  useLayoutEffect(() => {
+    if (responseExpanded || resultVersion === 0) return;
+
+    responseRef.current?.scrollIntoView({
+      behavior: 'instant',
+      block: 'end',
+    });
+  }, [responseExpanded]);
 
   const showResult = (text: string) => {
     setResult(text);
@@ -341,7 +354,10 @@ const APICall: React.FC<APICallProps> = ({
   const requestPreview = `POST ${previewUrl}\n\n${JSON.stringify(previewBody, undefined, 2)}`;
 
   return (
-    <div className="sidebar" ref={sidebarRef}>
+    <div
+      className={`sidebar${responseExpanded ? ' sidebar--response-expanded' : ''}`}
+      ref={sidebarRef}
+    >
       <header className="sidebar-header">
         <div className="sidebar-header-main">
           <div className="sidebar-header-title">
@@ -615,14 +631,43 @@ const APICall: React.FC<APICallProps> = ({
         className="sidebar-content sidebar-content--response"
         ref={responseRef}
       >
-        <h3>Response</h3>
-        <p>Click on features in the map to view their properties.</p>
+        <div className="response-header">
+          <div className="response-header__text">
+            <h3>Response</h3>
+            <p>Click on mapped features to view their properties.</p>
+          </div>
 
-        <fieldset>
-          {/* Compact placeholder until a response arrives, so the sidebar
-              doesn't reserve space for an empty field. */}
+          <ResponseActions
+            text={result}
+            expanded={responseExpanded}
+            onToggleExpanded={() => setResponseExpanded((prev) => !prev)}
+            showCopy={false}
+            showExpand={true}
+          />
+        </div>
+
+        <fieldset className="response-field">
           {result ? (
-            <textarea value={result} readOnly cols={50} rows={15} />
+            <>
+              {/* Compact placeholder until a response arrives, so the sidebar
+              doesn't reserve space for an empty field. */}
+              <textarea
+                className="response-textarea"
+                value={result}
+                readOnly
+                cols={50}
+                rows={15}
+              />
+
+              {/* Hide the Copy-Button until a response ist given. */}
+              <ResponseActions
+                text={result}
+                expanded={responseExpanded}
+                onToggleExpanded={() => setResponseExpanded((prev) => !prev)}
+                showCopy={true}
+                showExpand={false}
+              />
+            </>
           ) : (
             <p className="empty">No response yet.</p>
           )}

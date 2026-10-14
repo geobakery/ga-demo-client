@@ -922,6 +922,143 @@ select {
   border-color: var(--accent);
 }
 
+.response-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.response-header__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.response-header + fieldset {
+  margin-top: 18px;
+}
+
+.response-actions {
+  display: flex;
+  flex: none;
+  gap: 2px;
+
+  margin: -4px -4px 0 0;
+}
+
+.response-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: none;
+
+  width: 28px;
+  height: 28px;
+  padding: 0;
+
+  color: var(--ink-3);
+  background: transparent;
+
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.response-action:hover:not(:disabled) {
+  color: var(--ink);
+  background: var(--surface-sunken);
+  border-color: var(--line-strong);
+}
+
+.response-action:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.response-action.is-done {
+  color: var(--success);
+}
+
+.response-action:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.response-action svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* Full view: the response fills the whole sidebar. */
+.sidebar--response-expanded > :not(.sidebar-content--response) {
+  display: none;
+}
+
+.sidebar--response-expanded .sidebar-content--response {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+
+  min-height: 0;
+}
+
+.sidebar--response-expanded .sidebar-content--response textarea {
+  resize: none;
+}
+
+.response-field {
+  position: relative;
+  min-width: 0;
+}
+
+.response-field .response-textarea {
+  padding-bottom: 38px;
+}
+
+.response-action--copy {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 2;
+
+  color: var(--ink-4);
+  background: transparent;
+
+  border-color: transparent;
+  box-shadow: none;
+
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.response-action--copy:hover:not(:disabled) {
+  color: var(--ink-2);
+  background: var(--surface-sunken);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.response-action--copy.is-done {
+  color: var(--success);
+}
+
+/* Keep the copy button inside the response field in full view as well. */
+.sidebar--response-expanded .response-field {
+  position: relative;
+  flex: 1 1 auto;
+}
+
+.sidebar--response-expanded .response-field .response-textarea {
+  height: 100%;
+}
+
 .clear-responses-control {
   position: relative;
 }
@@ -1130,6 +1267,13 @@ select {
     width: 100%;
 
     overflow: visible;
+  }
+
+  .sidebar--response-expanded {
+    height: calc(100vh - 2 * var(--app-pad));
+    height: calc(100dvh - 2 * var(--app-pad));
+    min-height: 0;
+    overflow: hidden;
   }
 
   .sidebar-header {
