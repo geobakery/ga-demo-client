@@ -189,7 +189,7 @@ const APICall: React.FC<APICallProps> = ({
     });
   }, [resultVersion]);
 
-  // Restore the scroll position after leaving the full view,
+  // Restore the scroll position after leaving the full view.
   useLayoutEffect(() => {
     if (responseExpanded || resultVersion === 0) return;
 
@@ -647,10 +647,10 @@ const APICall: React.FC<APICallProps> = ({
         </div>
 
         <fieldset className="response-field">
+          {/* Compact placeholder until a response arrives, so the sidebar
+              doesn't reserve space for an empty field. */}
           {result ? (
             <>
-              {/* Compact placeholder until a response arrives, so the sidebar
-              doesn't reserve space for an empty field. */}
               <textarea
                 className="response-textarea"
                 value={result}
@@ -659,7 +659,7 @@ const APICall: React.FC<APICallProps> = ({
                 rows={15}
               />
 
-              {/* Hide the Copy-Button until a response ist given. */}
+              {/* Hide the Copy-Button until a response is given. */}
               <ResponseActions
                 text={result}
                 expanded={responseExpanded}

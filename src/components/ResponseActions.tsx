@@ -59,9 +59,10 @@ const ResponseActions: React.FC<ResponseActionsProps> = ({
   const [copied, setCopied] = useState(false);
   const copiedTimer = useRef<number | undefined>(undefined);
 
-  // Escape leaves the full view.
+  // Escape leaves the full view. Only the instance with the expand button
+  // listens, otherwise every instance would toggle.
   useEffect(() => {
-    if (!expanded) return;
+    if (!expanded || !showExpand) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -74,7 +75,7 @@ const ResponseActions: React.FC<ResponseActionsProps> = ({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [expanded, onToggleExpanded]);
+  }, [expanded, showExpand, onToggleExpanded]);
 
   useEffect(() => {
     return () => {
