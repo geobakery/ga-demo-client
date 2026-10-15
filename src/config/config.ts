@@ -1,5 +1,6 @@
 import { normalizeApiUrl } from '../utils/apiUrl';
 import saxonyOutline from './saxony-outline.json';
+import type { PathOptions } from 'leaflet';
 
 // Default API base URL (build-time value from the environment). The base must
 // include the version segment (e.g. ".../ga/v2") so that the appended endpoint
@@ -26,6 +27,32 @@ export const DEFAULT_INTERFACE: InterfaceName = 'within';
 export type RequestParameters = {
   count?: number;
   maxDistanceToNeighbour?: number;
+  buffer?: number;
+  returnBufferGeometry?: boolean;
+};
+
+export const API_GEOMETRY_STYLE: PathOptions = {
+  color: 'coral',
+  weight: 2,
+  opacity: 1,
+};
+
+export const BUFFER_GEOMETRY_STYLE: PathOptions = {
+  color: '#2563eb',
+  weight: 2,
+  opacity: 1,
+  dashArray: '6 6',
+  fillColor: '#2563eb',
+  fillOpacity: 0.08,
+};
+
+// Style of the clicked result geometry: thick purple outline, light purple fill.
+export const SELECTED_GEOMETRY_STYLE: PathOptions = {
+  color: '#7c3aed',
+  weight: 4,
+  opacity: 1,
+  fillColor: '#7c3aed',
+  fillOpacity: 0.3,
 };
 
 // Parameters editable in the UI.
@@ -35,8 +62,8 @@ export const INTERFACE_PARAMETER_MAPPING: Record<
   InterfaceName,
   ParameterName[]
 > = {
-  within: ['returnGeometry'],
-  intersect: ['returnGeometry'],
+  within: ['returnGeometry', 'buffer', 'returnBufferGeometry'],
+  intersect: ['returnGeometry', 'buffer', 'returnBufferGeometry'],
   nearestNeighbour: ['returnGeometry', 'count', 'maxDistanceToNeighbour'],
   valuesAtPoint: [],
 };
@@ -48,13 +75,22 @@ export type InterfaceDefaults = {
 
 // valuesAtPoint returns attribute values only, so returnGeometry is off.
 export const INTERFACE_DEFAULTS: Record<InterfaceName, InterfaceDefaults> = {
-  within: { returnGeometry: true, parameters: {} },
-  intersect: { returnGeometry: true, parameters: {} },
+  within: {
+    returnGeometry: true,
+    parameters: { buffer: 0, returnBufferGeometry: false },
+  },
+  intersect: {
+    returnGeometry: true,
+    parameters: { buffer: 0, returnBufferGeometry: false },
+  },
   nearestNeighbour: {
     returnGeometry: true,
     parameters: { count: 5, maxDistanceToNeighbour: 2000 },
   },
-  valuesAtPoint: { returnGeometry: false, parameters: {} },
+  valuesAtPoint: {
+    returnGeometry: false,
+    parameters: {},
+  },
 };
 
 // Initial map view

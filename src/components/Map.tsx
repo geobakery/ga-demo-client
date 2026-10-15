@@ -1,14 +1,20 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   MapContainer,
   TileLayer,
   FeatureGroup,
   Polygon,
   GeoJSON,
+  useMapEvents,
 } from 'react-leaflet';
 import L, { LatLngExpression } from 'leaflet';
 import { EditControl } from 'react-leaflet-draw';
-import { Feature, FeatureCollection, Geometry } from 'geojson';
+import {
+  Feature,
+  FeatureCollection,
+  GeoJsonProperties,
+  Geometry,
+} from 'geojson';
 import {
   BOUNDING_BOX,
   SHOW_BBOX,
@@ -16,6 +22,9 @@ import {
   SHOW_SAXONY_OUTLINE,
   TILE_LAYER_URL,
   TILE_LAYER_ATTRIBUTION,
+  API_GEOMETRY_STYLE,
+  BUFFER_GEOMETRY_STYLE,
+  SELECTED_GEOMETRY_STYLE,
 } from '../config/config';
 import { propertiesToElement } from '../utils/popup';
 import { collectGeometries } from '../utils/geometries';
@@ -41,12 +50,63 @@ const SAXONY_BORDER_STYLE: L.PathOptions = {
   fill: false,
 };
 
+// Defined once on purpose: react-leaflet re-applies the style prop to all
+// layers whenever its identity changes, which would wipe the highlight.
+const getApiFeatureStyle = (
+  feature?: Feature<Geometry, GeoJsonProperties>,
+): L.PathOptions =>
+  feature?.properties?.__buffer === true
+    ? BUFFER_GEOMETRY_STYLE
+    : API_GEOMETRY_STYLE;
+
+// Layers with path styling (polygons, lines, multi-geometries); markers have
+// no setStyle and are not highlighted.
+type StyleableLayer = L.Layer & {
+  setStyle: (style: L.PathOptions) => void;
+  bringToFront?: () => void;
+};
+
+const isStyleable = (layer: L.Layer): layer is StyleableLayer => {
+  return 'setStyle' in layer && typeof layer.setStyle === 'function';
+};
+
+// Must match the breakpoint in App.css where the map is stacked above the
+// sidebar.
+const STACKED_LAYOUT_QUERY = '(max-width: 768px)';
+
+// True while the map is stacked above the sidebar (narrow screens).
+const useStackedLayout = () => {
+  const [stacked, setStacked] = useState(
+    () => window.matchMedia(STACKED_LAYOUT_QUERY).matches,
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(STACKED_LAYOUT_QUERY);
+    const handleChange = (event: MediaQueryListEvent) =>
+      setStacked(event.matches);
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  return stacked;
+};
+
+// Reports clicks on the map itself (not on a layer that handled the click).
+const MapClickHandler: React.FC<{
+  onClick: (event: L.LeafletMouseEvent) => void;
+}> = ({ onClick }) => {
+  useMapEvents({ click: onClick });
+  return null;
+};
+
 interface MapProps {
   initialPosition: LatLngExpression;
   initialZoom: number;
   setUserGeometries: (geometries: Feature<Geometry>[]) => void;
-  apiGeometries: Feature<Geometry>[];
+  apiGeometries: Feature<Geometry, GeoJsonProperties>[];
   clearApiGeometries: () => void;
+  onFeatureSelect: (properties: GeoJsonProperties) => void;
 }
 
 const Map: React.FC<MapProps> = ({
@@ -55,8 +115,16 @@ const Map: React.FC<MapProps> = ({
   setUserGeometries,
   apiGeometries,
   clearApiGeometries,
+  onFeatureSelect,
 }) => {
   const featureGroupRef = useRef<L.FeatureGroup>(null);
+  const geoJsonRef = useRef<L.GeoJSON>(null);
+  // Currently highlighted result geometry.
+  const selectedLayerRef = useRef<L.Layer | null>(null);
+  // Browser event of the last click on a result geometry, so the map-level
+  // click that follows the same event doesn't clear the new selection.
+  const lastLayerClickRef = useRef<Event | null>(null);
+  const isStackedLayout = useStackedLayout();
 
   // Mirror the FeatureGroup into state after every create/edit/delete.
   // leaflet-draw keeps the group current, so replacing the state with its
@@ -81,10 +149,62 @@ const Map: React.FC<MapProps> = ({
     features: apiGeometries,
   };
 
+  // Restore the original style of the highlighted geometry.
+  const clearHighlight = () => {
+    const layer = selectedLayerRef.current;
+    if (layer) geoJsonRef.current?.resetStyle(layer);
+    selectedLayerRef.current = null;
+  };
+
+  const highlightLayer = (layer: L.Layer) => {
+    if (selectedLayerRef.current === layer) return;
+
+    clearHighlight();
+
+    if (isStyleable(layer)) {
+      layer.setStyle(SELECTED_GEOMETRY_STYLE);
+      layer.bringToFront?.();
+      selectedLayerRef.current = layer;
+    }
+  };
+
+  // Click on the map but not on a result geometry: back to the normal view.
+  const handleMapClick = (event: L.LeafletMouseEvent) => {
+    if (event.originalEvent === lastLayerClickRef.current) return;
+
+    clearHighlight();
+    onFeatureSelect(null);
+  };
+
+  // The GeoJSON layer is rebuilt when geometries or the layout mode change,
+  // which drops the highlighted layer; reset the selection with it.
+  const geoJsonKey = `${apiGeometries.length}-${isStackedLayout}`;
+
+  useEffect(() => {
+    selectedLayerRef.current = null;
+    onFeatureSelect(null);
+  }, [geoJsonKey, onFeatureSelect]);
+
+  // Wide screens: popup on the map. Stacked layout: no popup, the info block
+  // below the map shows the clicked feature's properties instead.
   const onEachApiFeature = (feature: Feature, layer: L.Layer) => {
+    layer.on('click', (event: L.LeafletMouseEvent) => {
+      lastLayerClickRef.current = event.originalEvent;
+      highlightLayer(layer);
+
+      if (isStackedLayout) onFeatureSelect(feature.properties);
+    });
+
+    if (isStackedLayout) return;
+
     layer.bindPopup(propertiesToElement(feature.properties), {
       maxWidth: 360,
       maxHeight: 360,
+    });
+
+    // Popup closed (e.g. via its close button): no highlight anymore.
+    layer.on('popupclose', () => {
+      if (selectedLayerRef.current === layer) clearHighlight();
     });
   };
 
@@ -103,9 +223,9 @@ const Map: React.FC<MapProps> = ({
               zoomSnap: 0.5,
             })}
         scrollWheelZoom={true}
-        style={{ height: '100%', width: '100%' }}
       >
         <TileLayer attribution={TILE_LAYER_ATTRIBUTION} url={TILE_LAYER_URL} />
+        <MapClickHandler onClick={handleMapClick} />
         {/* Non-interactive so the border never swallows a click meant for a
             drawn or returned geometry. */}
         {SHOW_SAXONY_OUTLINE && (
@@ -121,9 +241,10 @@ const Map: React.FC<MapProps> = ({
         )}
         {SHOW_BBOX && <BboxLabels />}
         <GeoJSON
-          key={apiGeometries.length}
+          ref={geoJsonRef}
+          key={geoJsonKey}
           data={apiFeatureCollection}
-          style={{ color: 'coral' }}
+          style={getApiFeatureStyle}
           onEachFeature={onEachApiFeature}
         />
         {apiGeometries.length > 0 && (

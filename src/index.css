@@ -1,28 +1,72 @@
-/* Design tokens: one neutral scale, one accent, light and dark. */
-:root {
-  --bg: #f3f5f7;
+/* Design tokens: one neutral scale, one accent, light and dark.
+   Leaflet popups, tooltips and controls always have a light background, so
+   they keep the light values in both schemes. */
+:root,
+.leaflet-popup,
+.leaflet-tooltip,
+.leaflet-bar {
+  --bg: #e9eee9;
+  --sidebar-bg: #f4f6f3;
   --surface: #ffffff;
-  --surface-muted: #f8fafc;
-  --border: #d6dce3;
-  --border-strong: #b6bfc9;
-  --text: #1f2937;
-  --text-muted: #64748b;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --accent-contrast: #ffffff;
-  --success: #2e7d32;
-  --warning: #b57d00;
-  --danger: #c0392b;
-  --focus-ring: rgba(37, 99, 235, 0.35);
-  --shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.06);
-  --radius: 8px;
-  --radius-sm: 6px;
+  --surface-sunken: #f6f8f5;
+  --field: #ffffff;
+  --map-bg: #dbe4ee;
 
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --line: #e4e9e3;
+  --line-strong: #d2d9d1;
+  --card-border: transparent;
+  /* Borders of inputs and selects need 3:1 against their background
+     (WCAG 1.4.11). */
+  --field-border: #8a958f;
+
+  --ink: #1f2a27;
+  --ink-2: #44524d;
+  --ink-3: #68756f;
+  --ink-4: #94a09a;
+
+  --accent: #2d7a6e;
+  --accent-hover: #236557;
+  --accent-soft: #e4f1ed;
+  --accent-contrast: #ffffff;
+
+  --success: #1e7b4a;
+  --warning: #a15c07;
+  --danger: #b42318;
+  --danger-soft: #fdf0ee;
+
+  --focus-ring: rgba(45, 122, 110, 0.28);
+  --selection: rgba(45, 122, 110, 0.2);
+
+  --shadow-sm:
+    0 1px 2px rgba(31, 42, 39, 0.05), 0 2px 10px rgba(31, 42, 39, 0.04);
+  --shadow:
+    0 2px 4px rgba(31, 42, 39, 0.04), 0 14px 36px rgba(31, 42, 39, 0.09);
+  --shadow-panel:
+    0 2px 6px rgba(31, 42, 39, 0.12), 0 18px 40px rgba(31, 42, 39, 0.28);
+  --shadow-up:
+    0 -8px 16px rgba(31, 42, 39, 0.06), 0 -2px 5px rgba(31, 42, 39, 0.08);
+
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2366727e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+
+:root {
+  --radius: 18px;
+  --radius-sm: 10px;
+
+  --font-sans:
+    Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    monospace;
+
+  --app-pad: clamp(4px, 1.2vw, 12px);
+
+  font-family: var(--font-sans);
   line-height: 1.5;
   font-weight: 400;
   color-scheme: light dark;
-  color: var(--text);
+  color: var(--ink);
   background-color: var(--bg);
 
   font-synthesis: none;
@@ -32,29 +76,48 @@
 }
 
 @media (prefers-color-scheme: dark) {
+  /* Higher layers are lighter; cards get a border because shadows don't
+     show on dark backgrounds. Neutrals are kept cool so only the accent
+     carries color. */
   :root {
-    --bg: #16181d;
-    --surface: #1f2229;
-    --surface-muted: #23262e;
-    --border: #363b45;
-    --border-strong: #4b515d;
-    --text: #e3e6ea;
-    --text-muted: #9aa3af;
-    --accent: #4f83f1;
-    --accent-hover: #6b96f3;
-    --accent-contrast: #0e1116;
-    --success: #4caf50;
-    --warning: #d9a114;
-    --danger: #e06552;
-    --focus-ring: rgba(79, 131, 241, 0.4);
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.25);
-  }
-}
+    --bg: #0e1113;
+    --sidebar-bg: #15191c;
+    --surface: #1f2428;
+    --surface-sunken: #1a1e21;
+    --field: #272d32;
+    --map-bg: #1b2126;
 
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
+    --line: #323a40;
+    --line-strong: #3d454b;
+    --card-border: var(--line);
+    --field-border: #6f7a81;
+
+    --ink: #e6eaec;
+    --ink-2: #c3cacd;
+    --ink-3: #9aa4a9;
+    --ink-4: #7d888e;
+
+    --accent: #4fae9e;
+    --accent-hover: #6cc2b3;
+    --accent-soft: #1d3530;
+    --accent-contrast: #0d1412;
+
+    --success: #4caf7a;
+    --warning: #d9a14a;
+    --danger: #e06552;
+    --danger-soft: #3a2220;
+
+    --focus-ring: rgba(79, 174, 158, 0.4);
+    --selection: rgba(79, 174, 158, 0.3);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 10px rgba(0, 0, 0, 0.2);
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 14px 36px rgba(0, 0, 0, 0.35);
+    --shadow-panel:
+      0 2px 6px rgba(0, 0, 0, 0.4), 0 18px 40px rgba(0, 0, 0, 0.5);
+    --shadow-up: 0 -8px 16px rgba(0, 0, 0, 0.25), 0 -2px 5px rgba(0, 0, 0, 0.3);
+
+    --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa4a9' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  }
 }
 
 a {
@@ -66,39 +129,7 @@ a:hover {
   color: var(--accent-hover);
 }
 
-/* Form controls: shared, consistent appearance */
-input[type='text'],
-input[type='number'],
-select,
-textarea {
-  font-family: inherit;
-  font-size: 0.9rem;
-  color: var(--text);
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 6px 10px;
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
-}
-
-input[type='text']:hover,
-input[type='number']:hover,
-select:hover,
-textarea:hover {
-  border-color: var(--border-strong);
-}
-
-input[type='text']:focus-visible,
-input[type='number']:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--focus-ring);
-}
-
+/* Text inputs, selects and textareas are styled in App.css. */
 input[type='checkbox'] {
   accent-color: var(--accent);
   width: 15px;
@@ -109,9 +140,9 @@ button {
   font-family: inherit;
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--text);
+  color: var(--ink);
   background-color: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
   padding: 7px 14px;
   cursor: pointer;
@@ -121,8 +152,8 @@ button {
     box-shadow 0.15s ease;
 }
 button:hover {
-  background-color: var(--surface-muted);
-  border-color: var(--border-strong);
+  background-color: var(--surface-sunken);
+  border-color: var(--ink-4);
 }
 button:focus-visible {
   outline: none;
