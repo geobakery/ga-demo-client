@@ -15,13 +15,15 @@ export type ApiRequest = {
   body: Record<string, unknown>;
 };
 
-// valuesAtPoint accepts point geometries only; other interfaces take all.
+// valuesAtPoint accepts only Point, LineString and Polygon geometries
 export function selectInputGeometries(
   interfaceName: InterfaceName,
   geometries: Feature<Geometry>[],
 ): Feature<Geometry>[] {
   return interfaceName === 'valuesAtPoint'
-    ? geometries.filter((feature) => feature.geometry.type === 'Point')
+    ? geometries.filter((feature) =>
+        ['Point', 'LineString', 'Polygon'].includes(feature.geometry.type),
+      )
     : geometries;
 }
 
@@ -37,7 +39,7 @@ export function validateGeometries(
     interfaceName === 'valuesAtPoint' &&
     selectInputGeometries(interfaceName, geometries).length === 0
   ) {
-    return 'ValuesAtPoint requires a point geometry. Please draw a marker.';
+    return 'ValuesAtPoint requires a Point, LineString or Polygon geometry. Please draw a supported geometry.';
   }
   return null;
 }
