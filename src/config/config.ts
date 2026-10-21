@@ -14,7 +14,7 @@ export const INTERFACES = [
   'within',
   'intersect',
   'nearestNeighbour',
-  'valuesAtPoint',
+  'valuesAtGrid',
 ] as const;
 
 export type InterfaceName = (typeof INTERFACES)[number];
@@ -65,7 +65,7 @@ export const INTERFACE_PARAMETER_MAPPING: Record<
   within: ['returnGeometry', 'buffer', 'returnBufferGeometry'],
   intersect: ['returnGeometry', 'buffer', 'returnBufferGeometry'],
   nearestNeighbour: ['returnGeometry', 'count', 'maxDistanceToNeighbour'],
-  valuesAtPoint: [],
+  valuesAtGrid: [],
 };
 
 export type InterfaceDefaults = {
@@ -73,7 +73,7 @@ export type InterfaceDefaults = {
   parameters: RequestParameters;
 };
 
-// valuesAtPoint returns attribute values only, so returnGeometry is off.
+// valuesAtGrid returns attribute values only, so returnGeometry is off.
 export const INTERFACE_DEFAULTS: Record<InterfaceName, InterfaceDefaults> = {
   within: {
     returnGeometry: true,
@@ -87,7 +87,7 @@ export const INTERFACE_DEFAULTS: Record<InterfaceName, InterfaceDefaults> = {
     returnGeometry: true,
     parameters: { count: 5, maxDistanceToNeighbour: 2000 },
   },
-  valuesAtPoint: {
+  valuesAtGrid: {
     returnGeometry: false,
     parameters: {},
   },

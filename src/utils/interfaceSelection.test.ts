@@ -5,7 +5,7 @@ import { selectInterface, topicsForInterface } from './interfaceSelection';
 const topics: Topic[] = [
   { identifier: 'kreis_f', interfaces: ['within', 'intersect'] },
   { identifier: 'gemeinde_f', interfaces: ['within'] },
-  { identifier: 'hoehe', interfaces: ['valuesAtPoint'] },
+  { identifier: 'hoehe', interfaces: ['valuesAtGrid'] },
 ];
 
 describe('topicsForInterface', () => {
@@ -45,7 +45,7 @@ describe('selectInterface', () => {
 
   it('clears the parameter values for an interface without parameters', () => {
     expect(
-      selectInterface('valuesAtPoint', topics, []).parameterValues,
+      selectInterface('valuesAtGrid', topics, []).parameterValues,
     ).toEqual({});
   });
 
@@ -59,8 +59,8 @@ describe('selectInterface', () => {
     expect(selectInterface('within', topics, []).returnGeometry).toBe(true);
   });
 
-  it('turns returnGeometry off for valuesAtPoint', () => {
-    expect(selectInterface('valuesAtPoint', topics, []).returnGeometry).toBe(
+  it('turns returnGeometry off for valuesAtGrid', () => {
+    expect(selectInterface('valuesAtGrid', topics, []).returnGeometry).toBe(
       false,
     );
   });
@@ -97,7 +97,7 @@ describe('selectInterface', () => {
 
     it('uses the defaults when the previous interface lacks the parameter', () => {
       const selection = selectInterface('within', topics, [], {
-        interfaceName: 'valuesAtPoint',
+        interfaceName: 'valuesAtGrid',
         parameterValues: {},
         returnGeometry: false,
       });

@@ -63,9 +63,9 @@ const baseInput: RequestInput = {
 };
 
 describe('selectInputGeometries', () => {
-  it('keeps Point, LineString and Polygon for valuesAtPoint', () => {
+  it('keeps Point, LineString and Polygon for valuesAtGrid', () => {
     expect(
-      selectInputGeometries('valuesAtPoint', [
+      selectInputGeometries('valuesAtGrid', [
         multiPoint,
         polygon,
         lineString,
@@ -74,8 +74,8 @@ describe('selectInputGeometries', () => {
     ).toEqual([polygon, lineString, point]);
   });
 
-  it('excludes unsupported geometry types for valuesAtPoint', () => {
-    expect(selectInputGeometries('valuesAtPoint', [multiPoint])).toEqual([]);
+  it('excludes unsupported geometry types for valuesAtGrid', () => {
+    expect(selectInputGeometries('valuesAtGrid', [multiPoint])).toEqual([]);
   });
 
   it('passes all geometries through for other interfaces', () => {
@@ -90,8 +90,8 @@ describe('validateGeometries', () => {
     expect(validateGeometries('within', [])).toMatch(/No geometries/);
   });
 
-  it('rejects valuesAtPoint without a supported geometry', () => {
-    expect(validateGeometries('valuesAtPoint', [multiPoint])).toMatch(
+  it('rejects valuesAtGrid without a supported geometry', () => {
+    expect(validateGeometries('valuesAtGrid', [multiPoint])).toMatch(
       /requires a Point, LineString or Polygon geometry/,
     );
   });
@@ -101,15 +101,15 @@ describe('validateGeometries', () => {
     ['LineString', lineString],
     ['Polygon', polygon],
   ])(
-    'accepts valuesAtPoint with a Point, LineString or Polygon as geometry',
+    'accepts valuesAtGrid with a Point, LineString or Polygon as geometry',
     (_type, geometry) => {
-      expect(validateGeometries('valuesAtPoint', [geometry])).toBeNull();
+      expect(validateGeometries('valuesAtGrid', [geometry])).toBeNull();
     },
   );
 
-  it('accepts valuesAtPoint with a mixture of supported geometries', () => {
+  it('accepts valuesAtGrid with a mixture of supported geometries', () => {
     expect(
-      validateGeometries('valuesAtPoint', [polygon, lineString, point]),
+      validateGeometries('valuesAtGrid', [polygon, lineString, point]),
     ).toBeNull();
   });
 
@@ -144,10 +144,10 @@ describe('buildRequest', () => {
     expect(body).toMatchObject({ count: 3, maxDistanceToNeighbour: 500 });
   });
 
-  it('sends all supported geometry types for valuesAtPoint', () => {
+  it('sends all supported geometry types for valuesAtGrid', () => {
     const { body } = buildRequest({
       ...baseInput,
-      interfaceName: 'valuesAtPoint',
+      interfaceName: 'valuesAtGrid',
       geometries: [polygon, lineString, point, multiPoint],
       returnGeometry: false,
     });
