@@ -13,6 +13,18 @@ const point: Feature<Geometry> = {
   geometry: { type: 'Point', coordinates: [13.8, 51.0] },
 };
 
+const lineString: Feature<Geometry> = {
+  type: 'Feature',
+  properties: {},
+  geometry: {
+    type: 'LineString',
+    coordinates: [
+      [13.7, 51.0],
+      [13.9, 51.1],
+    ],
+  },
+};
+
 const polygon: Feature<Geometry> = {
   type: 'Feature',
   properties: {},
@@ -29,6 +41,18 @@ const polygon: Feature<Geometry> = {
   },
 };
 
+const multiPoint: Feature<Geometry> = {
+  type: 'Feature',
+  properties: {},
+  geometry: {
+    type: 'MultiPoint',
+    coordinates: [
+      [13.8, 51.0],
+      [13.9, 51.1],
+    ],
+  },
+};
+
 const baseInput: RequestInput = {
   apiUrl: 'https://example.org/ga/v2',
   interfaceName: 'within',
@@ -39,17 +63,25 @@ const baseInput: RequestInput = {
 };
 
 describe('selectInputGeometries', () => {
-  it('keeps only points for valuesAtPoint', () => {
-    expect(selectInputGeometries('valuesAtPoint', [polygon, point])).toEqual([
-      point,
-    ]);
+  it('keeps Point, LineString and Polygon for valuesAtPoint', () => {
+    expect(
+      selectInputGeometries('valuesAtPoint', [
+        multiPoint,
+        polygon,
+        lineString,
+        point,
+      ]),
+    ).toEqual([polygon, lineString, point]);
+  });
+
+  it('excludes unsupported geometry types for valuesAtPoint', () => {
+    expect(selectInputGeometries('valuesAtPoint', [multiPoint])).toEqual([]);
   });
 
   it('passes all geometries through for other interfaces', () => {
-    expect(selectInputGeometries('within', [polygon, point])).toEqual([
-      polygon,
-      point,
-    ]);
+    expect(
+      selectInputGeometries('within', [polygon, point, lineString, multiPoint]),
+    ).toEqual([polygon, point, lineString, multiPoint]);
   });
 });
 
@@ -58,14 +90,27 @@ describe('validateGeometries', () => {
     expect(validateGeometries('within', [])).toMatch(/No geometries/);
   });
 
-  it('rejects valuesAtPoint without a point', () => {
-    expect(validateGeometries('valuesAtPoint', [polygon])).toMatch(
-      /requires a point/,
+  it('rejects valuesAtPoint without a supported geometry', () => {
+    expect(validateGeometries('valuesAtPoint', [multiPoint])).toMatch(
+      /requires a Point, LineString or Polygon geometry/,
     );
   });
 
-  it('accepts valuesAtPoint with at least one point', () => {
-    expect(validateGeometries('valuesAtPoint', [polygon, point])).toBeNull();
+  it.each([
+    ['Point', point],
+    ['LineString', lineString],
+    ['Polygon', polygon],
+  ])(
+    'accepts valuesAtPoint with a Point, LineString or Polygon as geometry',
+    (_type, geometry) => {
+      expect(validateGeometries('valuesAtPoint', [geometry])).toBeNull();
+    },
+  );
+
+  it('accepts valuesAtPoint with a mixture of supported geometries', () => {
+    expect(
+      validateGeometries('valuesAtPoint', [polygon, lineString, point]),
+    ).toBeNull();
   });
 
   it('accepts any geometry for other interfaces', () => {
@@ -99,14 +144,14 @@ describe('buildRequest', () => {
     expect(body).toMatchObject({ count: 3, maxDistanceToNeighbour: 500 });
   });
 
-  it('sends only point geometries for valuesAtPoint', () => {
+  it('sends all supported geometry types for valuesAtPoint', () => {
     const { body } = buildRequest({
       ...baseInput,
       interfaceName: 'valuesAtPoint',
-      geometries: [polygon, point],
+      geometries: [polygon, lineString, point, multiPoint],
       returnGeometry: false,
     });
-    expect(body.inputGeometries).toEqual([point]);
+    expect(body.inputGeometries).toEqual([polygon, lineString, point]);
     expect(body.returnGeometry).toBe(false);
   });
 });
