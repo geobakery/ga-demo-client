@@ -664,6 +664,7 @@ select {
 }
 
 #count,
+#minDistanceToNeighbour,
 #maxDistanceToNeighbour,
 #buffer {
   flex: none;
@@ -1299,6 +1300,7 @@ select {
   }
 
   #count,
+  #minDistanceToNeighbour,
   #maxDistanceToNeighbour,
   #buffer {
     width: 100%;
