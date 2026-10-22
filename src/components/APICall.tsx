@@ -531,6 +531,26 @@ const APICall: React.FC<APICallProps> = ({
                 </div>
               )}
 
+              {activeParameters.includes('minDistanceToNeighbour') && (
+                <div className="parameter-row">
+                  <input
+                    id="minDistanceToNeighbour"
+                    type="number"
+                    min="0"
+                    value={parameterValues.minDistanceToNeighbour ?? ''}
+                    onChange={(e) =>
+                      handleParameterChange(
+                        'minDistanceToNeighbour',
+                        e.target.value,
+                      )
+                    }
+                  />
+                  <label htmlFor="minDistanceToNeighbour">
+                    Min. Distance to Neighbour [m]
+                  </label>
+                </div>
+              )}
+
               {activeParameters.includes('maxDistanceToNeighbour') && (
                 <div className="parameter-row">
                   <input

@@ -26,6 +26,7 @@ export const DEFAULT_INTERFACE: InterfaceName = 'within';
 // returnGeometry is a common body field and therefore kept separate.
 export type RequestParameters = {
   count?: number;
+  minDistanceToNeighbour?: number;
   maxDistanceToNeighbour?: number;
   polygonExcludesInnerFeatures?: boolean;
   polygonExcludesEntirelyInnerFeatures?: boolean;
@@ -69,6 +70,7 @@ export const INTERFACE_PARAMETER_MAPPING: Record<
   nearestNeighbour: [
     'returnGeometry',
     'count',
+    'minDistanceToNeighbour',
     'maxDistanceToNeighbour',
     'polygonExcludesInnerFeatures',
     'polygonExcludesEntirelyInnerFeatures',
@@ -95,6 +97,7 @@ export const INTERFACE_DEFAULTS: Record<InterfaceName, InterfaceDefaults> = {
     returnGeometry: true,
     parameters: {
       count: 5,
+      minDistanceToNeighbour: 0,
       maxDistanceToNeighbour: 2000,
       polygonExcludesInnerFeatures: false,
       polygonExcludesEntirelyInnerFeatures: false,

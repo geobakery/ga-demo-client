@@ -68,9 +68,10 @@ export function buildRequest(input: RequestInput): ApiRequest {
 
   const parameters = Object.fromEntries(
     Object.entries(input.parameters).filter(
-      ([key]) =>
+      ([key, value]) =>
         activeParameters.includes(key as ParameterName) &&
-        key !== 'returnGeometry',
+        key !== 'returnGeometry' &&
+        !(key === 'minDistanceToNeighbour' && value === 0),
     ),
   );
 
