@@ -35,6 +35,7 @@ describe('selectInterface', () => {
       selectInterface('nearestNeighbour', topics, []).parameterValues,
     ).toEqual({
       count: 5,
+      minDistanceToNeighbour: 0,
       maxDistanceToNeighbour: 2000,
       polygonExcludesInnerFeatures: false,
       polygonExcludesEntirelyInnerFeatures: false,
@@ -95,6 +96,7 @@ describe('selectInterface', () => {
       );
       expect(selection.parameterValues).toEqual({
         count: 5,
+        minDistanceToNeighbour: 0,
         maxDistanceToNeighbour: 2000,
         polygonExcludesInnerFeatures: false,
         polygonExcludesEntirelyInnerFeatures: false,
