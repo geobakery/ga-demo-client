@@ -213,7 +213,9 @@ const APICall: React.FC<APICallProps> = ({
 
   type NumericParameterKey = Exclude<
     keyof RequestParameters,
-    'returnBufferGeometry'
+    | 'returnBufferGeometry'
+    | 'polygonExcludesInnerFeatures'
+    | 'polygonExcludesEntirelyInnerFeatures'
   >;
 
   const handleParameterChange = (key: NumericParameterKey, value: string) => {
@@ -244,6 +246,24 @@ const APICall: React.FC<APICallProps> = ({
       parameters.includes('buffer') &&
       parameters.includes('returnBufferGeometry')
     );
+  };
+
+  const handlePolygonExclusionChange = (
+    key:
+      'polygonExcludesInnerFeatures' | 'polygonExcludesEntirelyInnerFeatures',
+    checked: boolean,
+  ) => {
+    setParameterValues((prev) => ({
+      ...prev,
+      [key]: checked,
+      ...(checked
+        ? {
+            [key === 'polygonExcludesInnerFeatures'
+              ? 'polygonExcludesEntirelyInnerFeatures'
+              : 'polygonExcludesInnerFeatures']: false,
+          }
+        : {}),
+    }));
   };
 
   const handleInterfaceChange = (
@@ -287,7 +307,11 @@ const APICall: React.FC<APICallProps> = ({
     });
 
   const sendGeometryToAPI = () => {
-    const problem = validateGeometries(selectedInterface, userGeometries);
+    const problem = validateGeometries(
+      selectedInterface,
+      userGeometries,
+      parameterValues,
+    );
     if (problem) {
       console.error(problem);
       showResult(problem);
@@ -522,6 +546,51 @@ const APICall: React.FC<APICallProps> = ({
                   />
                   <label htmlFor="maxDistanceToNeighbour">
                     Max. Distance to Neighbour [m]
+                  </label>
+                </div>
+              )}
+
+              {activeParameters.includes('polygonExcludesInnerFeatures') && (
+                <div className="parameter-row">
+                  <input
+                    id="polygonExcludesInnerFeatures"
+                    type="checkbox"
+                    checked={
+                      parameterValues.polygonExcludesInnerFeatures ?? false
+                    }
+                    onChange={(e) =>
+                      handlePolygonExclusionChange(
+                        'polygonExcludesInnerFeatures',
+                        e.target.checked,
+                      )
+                    }
+                  />
+                  <label htmlFor="polygonExcludesInnerFeatures">
+                    Exclude features inside polygon
+                  </label>
+                </div>
+              )}
+
+              {activeParameters.includes(
+                'polygonExcludesEntirelyInnerFeatures',
+              ) && (
+                <div className="parameter-row">
+                  <input
+                    id="polygonExcludesEntirelyInnerFeatures"
+                    type="checkbox"
+                    checked={
+                      parameterValues.polygonExcludesEntirelyInnerFeatures ??
+                      false
+                    }
+                    onChange={(e) =>
+                      handlePolygonExclusionChange(
+                        'polygonExcludesEntirelyInnerFeatures',
+                        e.target.checked,
+                      )
+                    }
+                  />
+                  <label htmlFor="polygonExcludesEntirelyInnerFeatures">
+                    Exclude features entirely inside polygon
                   </label>
                 </div>
               )}

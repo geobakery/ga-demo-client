@@ -27,6 +27,8 @@ export const DEFAULT_INTERFACE: InterfaceName = 'within';
 export type RequestParameters = {
   count?: number;
   maxDistanceToNeighbour?: number;
+  polygonExcludesInnerFeatures?: boolean;
+  polygonExcludesEntirelyInnerFeatures?: boolean;
   buffer?: number;
   returnBufferGeometry?: boolean;
 };
@@ -64,7 +66,13 @@ export const INTERFACE_PARAMETER_MAPPING: Record<
 > = {
   within: ['returnGeometry', 'buffer', 'returnBufferGeometry'],
   intersect: ['returnGeometry', 'buffer', 'returnBufferGeometry'],
-  nearestNeighbour: ['returnGeometry', 'count', 'maxDistanceToNeighbour'],
+  nearestNeighbour: [
+    'returnGeometry',
+    'count',
+    'maxDistanceToNeighbour',
+    'polygonExcludesInnerFeatures',
+    'polygonExcludesEntirelyInnerFeatures',
+  ],
   valuesAtPoint: [],
 };
 
@@ -85,7 +93,12 @@ export const INTERFACE_DEFAULTS: Record<InterfaceName, InterfaceDefaults> = {
   },
   nearestNeighbour: {
     returnGeometry: true,
-    parameters: { count: 5, maxDistanceToNeighbour: 2000 },
+    parameters: {
+      count: 5,
+      maxDistanceToNeighbour: 2000,
+      polygonExcludesInnerFeatures: false,
+      polygonExcludesEntirelyInnerFeatures: false,
+    },
   },
   valuesAtPoint: {
     returnGeometry: false,
