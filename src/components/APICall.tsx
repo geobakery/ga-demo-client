@@ -22,6 +22,65 @@ import {
 } from '../utils/interfaceSelection';
 import ResponseActions from './ResponseActions';
 
+const formatJsonPreserveNumbers = (json: string): string => {
+  const tokens = json.match(
+    /"(?:\\.|[^"\\])*"|[{}[\],:]|-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?|true|false|null|\s+/g,
+  );
+
+  if (!tokens) return json;
+
+  let result = '';
+  let indent = 0;
+  let afterComma = false;
+
+  const newline = () => {
+    result = result.trimEnd() + '\n' + '    '.repeat(indent);
+  };
+
+  for (const token of tokens) {
+    if (/^\s+$/.test(token)) continue;
+
+    if (token.startsWith('"')) {
+      if (afterComma) newline();
+      result += token;
+      afterComma = false;
+      continue;
+    }
+
+    switch (token) {
+      case '{':
+      case '[':
+        result += token;
+        indent++;
+        newline();
+        break;
+
+      case '}':
+      case ']':
+        indent--;
+        newline();
+        result += token;
+        break;
+
+      case ',':
+        result += ',';
+        afterComma = true;
+        break;
+
+      case ':':
+        result += ': ';
+        break;
+
+      default:
+        if (afterComma) newline();
+        result += token;
+        afterComma = false;
+    }
+  }
+
+  return result;
+};
+
 interface APICallProps {
   userGeometries: Feature<Geometry>[];
   addApiGeometries: (
@@ -304,25 +363,32 @@ const APICall: React.FC<APICallProps> = ({
       body: JSON.stringify(body),
     })
       .then(async (response) => {
+        const responseText = await response.text();
+
         if (!response.ok) {
-          // Status line, blank line, API error body (indented if JSON)
-          const text = await response.text();
-          let details = text;
+          let details = responseText;
+
           try {
-            details = JSON.stringify(JSON.parse(text), undefined, 4);
+            details = JSON.stringify(JSON.parse(responseText), undefined, 4);
           } catch {
-            // not JSON, keep the raw text
+            // Keep the original text
           }
-          // statusText may be empty with HTTP/2
+
           const status =
             `HTTP ${response.status} ${response.statusText}`.trimEnd();
+
           throw new Error(details ? `${status}\n\n${details}` : status);
         }
-        return response.json();
-      })
-      .then((data: Feature<Geometry, GeoJsonProperties>[]) => {
-        showResult(JSON.stringify(data, undefined, 4));
 
+        showResult(formatJsonPreserveNumbers(responseText));
+
+        // Additionally parse the JSON for geometry processing:
+        return JSON.parse(responseText) as Feature<
+          Geometry,
+          GeoJsonProperties
+        >[];
+      })
+      .then((data) => {
         if (
           returnGeometryChecked ||
           parameterValues.returnBufferGeometry === true
@@ -333,7 +399,9 @@ const APICall: React.FC<APICallProps> = ({
       .catch((error) => {
         console.error('Request failed', error);
         showResult(
-          `Request failed: ${error instanceof Error ? error.message : String(error)}`,
+          `Request failed: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
         );
       });
   };
