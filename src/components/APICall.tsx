@@ -24,7 +24,7 @@ import ResponseActions from './ResponseActions';
 
 const formatJsonPreserveNumbers = (json: string): string => {
   const tokens = json.match(
-    /"(?:\\.|[^"\\])*"|[{}\[\],:]|-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?|true|false|null|\s+/g,
+    /"(?:\\.|[^"\\])*"|[{}[\],:]|-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?|true|false|null|\s+/g,
   );
 
   if (!tokens) return json;
@@ -369,11 +369,7 @@ const APICall: React.FC<APICallProps> = ({
           let details = responseText;
 
           try {
-            details = JSON.stringify(
-              JSON.parse(responseText),
-              undefined,
-              4,
-            );
+            details = JSON.stringify(JSON.parse(responseText), undefined, 4);
           } catch {
             // Keep the original text
           }
@@ -381,9 +377,7 @@ const APICall: React.FC<APICallProps> = ({
           const status =
             `HTTP ${response.status} ${response.statusText}`.trimEnd();
 
-          throw new Error(
-            details ? `${status}\n\n${details}` : status,
-          );
+          throw new Error(details ? `${status}\n\n${details}` : status);
         }
 
         showResult(formatJsonPreserveNumbers(responseText));
