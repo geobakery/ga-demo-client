@@ -71,6 +71,22 @@ describe('validateGeometries', () => {
   it('accepts any geometry for other interfaces', () => {
     expect(validateGeometries('within', [polygon])).toBeNull();
   });
+
+  it('rejects point geometries when polygon exclusion is enabled', () => {
+    expect(
+      validateGeometries('nearestNeighbour', [point], {
+        polygonExcludesInnerFeatures: true,
+      }),
+    ).toBe('Polygon exclusion options require Polygon input geometries.');
+  });
+
+  it('accepts polygon geometries when polygon exclusion is enabled', () => {
+    expect(
+      validateGeometries('nearestNeighbour', [polygon], {
+        polygonExcludesInnerFeatures: true,
+      }),
+    ).toBeNull();
+  });
 });
 
 describe('buildRequest', () => {
@@ -108,5 +124,24 @@ describe('buildRequest', () => {
     });
     expect(body.inputGeometries).toEqual([point]);
     expect(body.returnGeometry).toBe(false);
+  });
+
+  it('drops parameters that do not belong to the selected interface', () => {
+    const { body } = buildRequest({
+      ...baseInput,
+      interfaceName: 'within',
+      parameters: {
+        count: 5,
+        maxDistanceToNeighbour: 2000,
+        buffer: 100,
+      },
+    });
+
+    expect(body).toMatchObject({
+      buffer: 100,
+    });
+
+    expect(body).not.toHaveProperty('count');
+    expect(body).not.toHaveProperty('maxDistanceToNeighbour');
   });
 });

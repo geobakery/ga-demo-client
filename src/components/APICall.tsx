@@ -213,7 +213,9 @@ const APICall: React.FC<APICallProps> = ({
 
   type NumericParameterKey = Exclude<
     keyof RequestParameters,
-    'returnBufferGeometry'
+    | 'returnBufferGeometry'
+    | 'polygonExcludesInnerFeatures'
+    | 'polygonExcludesEntirelyInnerFeatures'
   >;
 
   const handleParameterChange = (key: NumericParameterKey, value: string) => {
@@ -224,6 +226,13 @@ const APICall: React.FC<APICallProps> = ({
       } else {
         next[key] = Number(value);
       }
+
+      // Min. Distance > 0 disables both polygon exclusion options.
+      if (key === 'minDistanceToNeighbour' && Number(value) > 0) {
+        next.polygonExcludesInnerFeatures = false;
+        next.polygonExcludesEntirelyInnerFeatures = false;
+      }
+
       return next;
     });
   };
@@ -244,6 +253,29 @@ const APICall: React.FC<APICallProps> = ({
       parameters.includes('buffer') &&
       parameters.includes('returnBufferGeometry')
     );
+  };
+
+  const handlePolygonExclusionChange = (
+    key:
+      'polygonExcludesInnerFeatures' | 'polygonExcludesEntirelyInnerFeatures',
+    checked: boolean,
+  ) => {
+    setParameterValues((prev) => ({
+      ...prev,
+      [key]: checked,
+
+      // The two polygon exclusion options are mutually exclusive.
+      ...(checked
+        ? {
+            [key === 'polygonExcludesInnerFeatures'
+              ? 'polygonExcludesEntirelyInnerFeatures'
+              : 'polygonExcludesInnerFeatures']: false,
+
+            // Activating a polygon exclusion resets Min. Distance to 0.
+            minDistanceToNeighbour: 0,
+          }
+        : {}),
+    }));
   };
 
   const handleInterfaceChange = (
@@ -287,7 +319,11 @@ const APICall: React.FC<APICallProps> = ({
     });
 
   const sendGeometryToAPI = () => {
-    const problem = validateGeometries(selectedInterface, userGeometries);
+    const problem = validateGeometries(
+      selectedInterface,
+      userGeometries,
+      parameterValues,
+    );
     if (problem) {
       console.error(problem);
       showResult(problem);
@@ -352,6 +388,17 @@ const APICall: React.FC<APICallProps> = ({
   // Live preview of what Send would post, rebuilt from current selections.
   const { url: previewUrl, body: previewBody } = currentRequest();
   const requestPreview = `POST ${previewUrl}\n\n${JSON.stringify(previewBody, undefined, 2)}`;
+
+  const polygonExclusionActive =
+    parameterValues.polygonExcludesInnerFeatures === true;
+
+  const entirePolygonExclusionActive =
+    parameterValues.polygonExcludesEntirelyInnerFeatures === true;
+
+  const minDistanceActive = (parameterValues.minDistanceToNeighbour ?? 0) > 0;
+
+  const hasExclusiveParameter =
+    polygonExclusionActive || entirePolygonExclusionActive || minDistanceActive;
 
   return (
     <div
@@ -507,6 +554,28 @@ const APICall: React.FC<APICallProps> = ({
                 </div>
               )}
 
+              {activeParameters.includes('minDistanceToNeighbour') && (
+                <div
+                  className={`parameter-row ${hasExclusiveParameter && !minDistanceActive ? 'parameter-row--dimmed' : ''}`}
+                >
+                  <input
+                    id="minDistanceToNeighbour"
+                    type="number"
+                    min="0"
+                    value={parameterValues.minDistanceToNeighbour ?? ''}
+                    onChange={(e) =>
+                      handleParameterChange(
+                        'minDistanceToNeighbour',
+                        e.target.value,
+                      )
+                    }
+                  />
+                  <label htmlFor="minDistanceToNeighbour">
+                    Min. Distance to Neighbour [m]
+                  </label>
+                </div>
+              )}
+
               {activeParameters.includes('maxDistanceToNeighbour') && (
                 <div className="parameter-row">
                   <input
@@ -522,6 +591,55 @@ const APICall: React.FC<APICallProps> = ({
                   />
                   <label htmlFor="maxDistanceToNeighbour">
                     Max. Distance to Neighbour [m]
+                  </label>
+                </div>
+              )}
+
+              {activeParameters.includes('polygonExcludesInnerFeatures') && (
+                <div
+                  className={`parameter-row ${hasExclusiveParameter && !polygonExclusionActive ? 'parameter-row--dimmed' : ''}`}
+                >
+                  <input
+                    id="polygonExcludesInnerFeatures"
+                    type="checkbox"
+                    checked={
+                      parameterValues.polygonExcludesInnerFeatures ?? false
+                    }
+                    onChange={(e) =>
+                      handlePolygonExclusionChange(
+                        'polygonExcludesInnerFeatures',
+                        e.target.checked,
+                      )
+                    }
+                  />
+                  <label htmlFor="polygonExcludesInnerFeatures">
+                    Exclude features partly or entirely inside polygon
+                  </label>
+                </div>
+              )}
+
+              {activeParameters.includes(
+                'polygonExcludesEntirelyInnerFeatures',
+              ) && (
+                <div
+                  className={`parameter-row ${hasExclusiveParameter && !entirePolygonExclusionActive ? 'parameter-row--dimmed' : ''}`}
+                >
+                  <input
+                    id="polygonExcludesEntirelyInnerFeatures"
+                    type="checkbox"
+                    checked={
+                      parameterValues.polygonExcludesEntirelyInnerFeatures ??
+                      false
+                    }
+                    onChange={(e) =>
+                      handlePolygonExclusionChange(
+                        'polygonExcludesEntirelyInnerFeatures',
+                        e.target.checked,
+                      )
+                    }
+                  />
+                  <label htmlFor="polygonExcludesEntirelyInnerFeatures">
+                    Exclude features entirely inside polygon
                   </label>
                 </div>
               )}

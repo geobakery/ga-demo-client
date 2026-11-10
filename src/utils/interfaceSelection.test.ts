@@ -33,7 +33,13 @@ describe('selectInterface', () => {
   it('resets the parameter values to the interface defaults', () => {
     expect(
       selectInterface('nearestNeighbour', topics, []).parameterValues,
-    ).toEqual({ count: 5, maxDistanceToNeighbour: 2000 });
+    ).toEqual({
+      count: 5,
+      minDistanceToNeighbour: 0,
+      maxDistanceToNeighbour: 2000,
+      polygonExcludesInnerFeatures: false,
+      polygonExcludesEntirelyInnerFeatures: false,
+    });
   });
 
   it('resets the buffer parameters to the defaults for within', () => {
@@ -90,7 +96,10 @@ describe('selectInterface', () => {
       );
       expect(selection.parameterValues).toEqual({
         count: 5,
+        minDistanceToNeighbour: 0,
         maxDistanceToNeighbour: 2000,
+        polygonExcludesInnerFeatures: false,
+        polygonExcludesEntirelyInnerFeatures: false,
       });
       expect(selection.returnGeometry).toBe(false);
     });

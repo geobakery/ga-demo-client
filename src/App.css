@@ -663,7 +663,22 @@ select {
   cursor: pointer;
 }
 
+/* Visually de-emphasize inactive, mutually exclusive parameters. */
+.parameter-row--dimmed {
+  opacity: 0.35;
+  transition: opacity 0.2s ease;
+}
+
+.parameter-row--dimmed input {
+  opacity: 0.55;
+}
+
+.parameter-row--dimmed label {
+  color: var(--ink-4);
+}
+
 #count,
+#minDistanceToNeighbour,
 #maxDistanceToNeighbour,
 #buffer {
   flex: none;
@@ -1299,6 +1314,7 @@ select {
   }
 
   #count,
+  #minDistanceToNeighbour,
   #maxDistanceToNeighbour,
   #buffer {
     width: 100%;
