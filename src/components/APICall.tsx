@@ -257,8 +257,7 @@ const APICall: React.FC<APICallProps> = ({
 
   const handlePolygonExclusionChange = (
     key:
-      | 'polygonExcludesInnerFeatures'
-      | 'polygonExcludesEntirelyInnerFeatures',
+      'polygonExcludesInnerFeatures' | 'polygonExcludesEntirelyInnerFeatures',
     checked: boolean,
   ) => {
     setParameterValues((prev) => ({
@@ -396,13 +395,10 @@ const APICall: React.FC<APICallProps> = ({
   const entirePolygonExclusionActive =
     parameterValues.polygonExcludesEntirelyInnerFeatures === true;
 
-  const minDistanceActive =
-    (parameterValues.minDistanceToNeighbour ?? 0) > 0;
+  const minDistanceActive = (parameterValues.minDistanceToNeighbour ?? 0) > 0;
 
   const hasExclusiveParameter =
-    polygonExclusionActive ||
-    entirePolygonExclusionActive ||
-    minDistanceActive;
+    polygonExclusionActive || entirePolygonExclusionActive || minDistanceActive;
 
   return (
     <div
@@ -559,7 +555,9 @@ const APICall: React.FC<APICallProps> = ({
               )}
 
               {activeParameters.includes('minDistanceToNeighbour') && (
-                <div className={`parameter-row ${hasExclusiveParameter && !minDistanceActive ? 'parameter-row--dimmed' : ''}`}>
+                <div
+                  className={`parameter-row ${hasExclusiveParameter && !minDistanceActive ? 'parameter-row--dimmed' : ''}`}
+                >
                   <input
                     id="minDistanceToNeighbour"
                     type="number"
@@ -598,7 +596,9 @@ const APICall: React.FC<APICallProps> = ({
               )}
 
               {activeParameters.includes('polygonExcludesInnerFeatures') && (
-                <div className={`parameter-row ${hasExclusiveParameter && !polygonExclusionActive ? 'parameter-row--dimmed' : ''}`}>
+                <div
+                  className={`parameter-row ${hasExclusiveParameter && !polygonExclusionActive ? 'parameter-row--dimmed' : ''}`}
+                >
                   <input
                     id="polygonExcludesInnerFeatures"
                     type="checkbox"
@@ -613,7 +613,7 @@ const APICall: React.FC<APICallProps> = ({
                     }
                   />
                   <label htmlFor="polygonExcludesInnerFeatures">
-                    Exclude features inside polygon
+                    Exclude features partly or entirely inside polygon
                   </label>
                 </div>
               )}
@@ -621,7 +621,9 @@ const APICall: React.FC<APICallProps> = ({
               {activeParameters.includes(
                 'polygonExcludesEntirelyInnerFeatures',
               ) && (
-                <div className={`parameter-row ${hasExclusiveParameter && !entirePolygonExclusionActive ? 'parameter-row--dimmed' : ''}`}>
+                <div
+                  className={`parameter-row ${hasExclusiveParameter && !entirePolygonExclusionActive ? 'parameter-row--dimmed' : ''}`}
+                >
                   <input
                     id="polygonExcludesEntirelyInnerFeatures"
                     type="checkbox"
