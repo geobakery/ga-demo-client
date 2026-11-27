@@ -62,6 +62,21 @@ export function validateGeometries(
   return null;
 }
 
+// Optional nearestNeighbour parameters whose value equals the server default.
+// They are left out of the body, so a request without these options stays
+// valid for GA versions that do not know the parameters yet.
+function isServerDefault(key: string, value: unknown): boolean {
+  switch (key) {
+    case 'minDistanceToNeighbour':
+      return value === 0;
+    case 'polygonExcludesInnerFeatures':
+    case 'polygonExcludesEntirelyInnerFeatures':
+      return value === false;
+    default:
+      return false;
+  }
+}
+
 // Build URL and body of a GA request from the current selections.
 export function buildRequest(input: RequestInput): ApiRequest {
   const activeParameters = INTERFACE_PARAMETER_MAPPING[input.interfaceName];
@@ -71,7 +86,7 @@ export function buildRequest(input: RequestInput): ApiRequest {
       ([key, value]) =>
         activeParameters.includes(key as ParameterName) &&
         key !== 'returnGeometry' &&
-        !(key === 'minDistanceToNeighbour' && value === 0),
+        !isServerDefault(key, value),
     ),
   );
 
