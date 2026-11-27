@@ -71,6 +71,22 @@ describe('validateGeometries', () => {
   it('accepts any geometry for other interfaces', () => {
     expect(validateGeometries('within', [polygon])).toBeNull();
   });
+
+  it('rejects point geometries when polygon exclusion is enabled', () => {
+    expect(
+      validateGeometries('nearestNeighbour', [point], {
+        polygonExcludesInnerFeatures: true,
+      }),
+    ).toBe('Polygon exclusion options require Polygon input geometries.');
+  });
+
+  it('accepts polygon geometries when polygon exclusion is enabled', () => {
+    expect(
+      validateGeometries('nearestNeighbour', [polygon], {
+        polygonExcludesInnerFeatures: true,
+      }),
+    ).toBeNull();
+  });
 });
 
 describe('buildRequest', () => {
@@ -108,5 +124,84 @@ describe('buildRequest', () => {
     });
     expect(body.inputGeometries).toEqual([point]);
     expect(body.returnGeometry).toBe(false);
+  });
+
+  it('drops parameters that do not belong to the selected interface', () => {
+    const { body } = buildRequest({
+      ...baseInput,
+      interfaceName: 'within',
+      parameters: {
+        count: 5,
+        maxDistanceToNeighbour: 2000,
+        buffer: 100,
+      },
+    });
+
+    expect(body).toMatchObject({
+      buffer: 100,
+    });
+
+    expect(body).not.toHaveProperty('count');
+    expect(body).not.toHaveProperty('maxDistanceToNeighbour');
+  });
+
+  it('omits nearestNeighbour options that equal the server default', () => {
+    const { body } = buildRequest({
+      ...baseInput,
+      interfaceName: 'nearestNeighbour',
+      parameters: {
+        count: 5,
+        minDistanceToNeighbour: 0,
+        maxDistanceToNeighbour: 2000,
+        polygonExcludesInnerFeatures: false,
+        polygonExcludesEntirelyInnerFeatures: false,
+      },
+    });
+
+    expect(body).toMatchObject({ count: 5, maxDistanceToNeighbour: 2000 });
+    expect(body).not.toHaveProperty('minDistanceToNeighbour');
+    expect(body).not.toHaveProperty('polygonExcludesInnerFeatures');
+    expect(body).not.toHaveProperty('polygonExcludesEntirelyInnerFeatures');
+  });
+
+  it('sends a minimum distance above 0', () => {
+    const { body } = buildRequest({
+      ...baseInput,
+      interfaceName: 'nearestNeighbour',
+      parameters: {
+        minDistanceToNeighbour: 50,
+        polygonExcludesInnerFeatures: false,
+        polygonExcludesEntirelyInnerFeatures: false,
+      },
+    });
+
+    expect(body).toMatchObject({ minDistanceToNeighbour: 50 });
+    expect(body).not.toHaveProperty('polygonExcludesInnerFeatures');
+    expect(body).not.toHaveProperty('polygonExcludesEntirelyInnerFeatures');
+  });
+
+  it('sends only the enabled polygon exclusion option', () => {
+    const { body } = buildRequest({
+      ...baseInput,
+      interfaceName: 'nearestNeighbour',
+      parameters: {
+        minDistanceToNeighbour: 0,
+        polygonExcludesInnerFeatures: false,
+        polygonExcludesEntirelyInnerFeatures: true,
+      },
+    });
+
+    expect(body).toMatchObject({ polygonExcludesEntirelyInnerFeatures: true });
+    expect(body).not.toHaveProperty('polygonExcludesInnerFeatures');
+    expect(body).not.toHaveProperty('minDistanceToNeighbour');
+  });
+
+  it('keeps returnBufferGeometry false for within', () => {
+    const { body } = buildRequest({
+      ...baseInput,
+      parameters: { buffer: 100, returnBufferGeometry: false },
+    });
+
+    expect(body).toMatchObject({ buffer: 100, returnBufferGeometry: false });
   });
 });
